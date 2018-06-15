@@ -38,7 +38,8 @@
 ---
 
 ## config.js
-### all below should be encapsulated inside `module.exports = { ... }`
+A config.js file is required in the root directory of the scraper for it to function correctly.
+All values specified below should be encapsulated inside `module.exports = { ... }`.
   - apiUrl
    - type: string
    - description: the url the request will be sent to after scraping the url specified in the initial request
