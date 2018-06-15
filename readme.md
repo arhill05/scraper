@@ -2,10 +2,11 @@
 
 ## endpoints
 ### /xpath
+ - scrapes a page for all elements matching the specified xpath and sends a request to the apiUrl specified in config.
  - parameters
    - url: the url to scrape **required**
    - xpath: xpath string to use **required**
-   - waitTime: how long to wait for the page to render
+   - waitTime: time to wait before scraping HTML
    - collection: collection passed to the crawler
    - subcollection: subcollection passed to the crawler
    - function: function passed to the crawler,
@@ -15,6 +16,7 @@
    - forceAllow: forceAllow passed to the crawler
 
 ### /node
+ - scrapes a page for all elements matching the specified query selector and sends a request to the apiUrl specified in config.
  - parameters
    - url: the url to scrape **required**
    - node: the node in the form of a querySelector to use **required**
@@ -26,10 +28,18 @@
    - crawlType: crawlType passed to the crawler
    - forceAllow: forceAllow passed to the crawler
 
+### /fullHtml
+ - returns the full html of a URL after waiting the specified time
+ - parameters
+   - url: the url to scrape **required**
+   - waitTime: time to wait before scraping HTML
+   - replacements: comma delimited replacements (i.e. ?replacements=a,b means a will be replaced with b in the result)
+
+---
 
 ## config.js
- - all below should be encapsulated inside `module.exports = { ... }`
- - apiUrl
+### all below should be encapsulated inside `module.exports = { ... }`
+  - apiUrl
    - type: string
    - description: the url the request will be sent to after scraping the url specified in the initial request
  - username
@@ -45,6 +55,22 @@
  - port
    - type: number
    - description: the port the server will run on
+ - isProduction
+   - type: boolean
+   - description: if disabled, informational and error logging to the console will be disabled
+### example:
+```javascript
+module.exports = {
+  apiUrl: 'http://myUrl.com/best/api/ever',
+  username: 'someusername',
+  password: 'somepassword',
+  dataReplacements: [{ replaceThis: '//', withThis: '' }, { replaceThis: 'href="', withThis: 'href="yourUrlGoesHere' }],
+  port: 3031,
+  isProduction: true
+};
+```
+
+---
 
 ## Installation
 ### Dependencies
