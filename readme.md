@@ -72,7 +72,7 @@ The scraper will return errors with a status of 500 in the following structure:
 
 **code** is a code representation of the error
 
-**stack** is the full stack trace of the error. This is only included if `isProduction` is true in the config.
+**stack** is the full stack trace of the error. This is only included if `isProduction` is false in the config.
 
 ### Error Codes
  - E001 : Url is required
