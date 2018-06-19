@@ -55,7 +55,6 @@ exports.scrapeUrlForXpath = async options => {
 };
 
 exports.scrapeUrlForFullHtml = async options => {
-  const nightmare = Nightmare({ show: false });
   if (!options.url) {
     var err = new Error('URL is required');
     err.code = errorCodes.UrlRequired;
@@ -69,6 +68,7 @@ exports.scrapeUrlForFullHtml = async options => {
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
   this.logInfo(`begin scrapeUrlForFullHtml`);
+  const nightmare = Nightmare({ show: false });
   try {
     result = await nightmare
       .goto(options.url)
@@ -88,15 +88,11 @@ exports.scrapeUrlForFullHtml = async options => {
 
 sendResults = async (data, options) => {
   this.logInfo(`begin crawler request`);
-  const replacements = config.dataReplacements;
   let url = config.apiUrl;
   let results = [];
   try {
     if (data instanceof Array) {
       for (let item of data) {
-        replacements.forEach(r => {
-          item = item.replace(r.replaceThis, r.withThis);
-        });
         let eachUrl = constructUrl(url, item, options);
         const response = await axios.get(eachUrl);
         results.push(response.data);
