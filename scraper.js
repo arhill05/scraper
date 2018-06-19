@@ -1,8 +1,24 @@
 const Nightmare = require('nightmare');
 const config = require('./config');
 const axios = require('axios');
+const errorCodes = require('./errorCodes.js');
 
 exports.scrapeUrlForXpath = async options => {
+  if (!options.url) {
+    var err = new Error('URL is required');
+    err.code = errorCodes.UrlRequired;
+    throw err;
+  }
+  if (!options.xpath) {
+    var err = new Error('xpath string is required');
+    err.code = errorCodes.XpathRequired;
+    throw err;
+  }
+  if (!isValidUrl(options.url)) {
+    var err = new Error('URL is invalid');
+    err.code = errorCodes.UrlInvalid;
+    throw err;
+  }
   const nightmare = Nightmare({ show: false });
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
@@ -25,7 +41,7 @@ exports.scrapeUrlForXpath = async options => {
         while ((node = result.iterateNext())) nodes.push(node.nodeValue);
         return nodes;
       }, options.xpath)
-      .end();
+      .catch(handleNightmareError);
 
     this.logInfo(`end scrape`);
     await sendResults(result, options);
@@ -33,11 +49,23 @@ exports.scrapeUrlForXpath = async options => {
   } catch (err) {
     this.logError(`error while scraping: ${err}`);
     throw err;
+  } finally {
+    nightmare.end();
   }
 };
 
 exports.scrapeUrlForFullHtml = async options => {
   const nightmare = Nightmare({ show: false });
+  if (!options.url) {
+    var err = new Error('URL is required');
+    err.code = errorCodes.UrlRequired;
+    throw err;
+  }
+  if (!isValidUrl(options.url)) {
+    var err = Error('URL is invalid');
+    err.code = errorCodes.UrlInvalid;
+    throw err;
+  }
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
   this.logInfo(`begin scrapeUrlForFullHtml`);
@@ -46,39 +74,16 @@ exports.scrapeUrlForFullHtml = async options => {
       .goto(options.url)
       .wait(wait)
       .evaluate(() => document.body.innerHTML)
-      .end();
+      .catch(handleNightmareError);
     this.logInfo(`end scrapeUrlForFullHtml`);
     result = replaceSubstrings(result, options.replacements);
     return result;
   } catch (err) {
     this.logError(`error while scrapeUrlForFullHtml: ${err}`);
     throw err;
+  } finally {
+    nightmare.end();
   }
-};
-
-exports.scrapeUrlForNode = async options => {
-  const nightmare = Nightmare({ show: false });
-  let result = null;
-  this.logInfo(`begin scrape`);
-  this.logInfo(`scraping ${options.url} for node ${options.node}`);
-  try {
-    result = await nightmare
-      .goto(options.url)
-      .wait(options.node)
-      .evaluate(node => {
-        let result = [];
-        document.querySelectorAll(node).forEach(el => {
-          result.push(el.innerHtml);
-        });
-      }, options.node)
-      .end();
-  } catch (err) {
-    this.logError(`error while scraping: ${err}`);
-    throw err;
-  }
-  this.logInfo(`end scrape`);
-  await sendResults(result);
-  return result;
 };
 
 sendResults = async (data, options) => {
@@ -141,15 +146,40 @@ constructUrl = (url, item, options) => {
   return resultUrl;
 };
 
+handleNightmareError = async error => {
+  var err = new Error(
+    'An error occurred internally while attempting to scrape using the context of a browser: ' +
+      error.message
+  );
+  err.code = errorCodes.BrowserContextError;
+  throw err;
+};
+
+isValidUrl = url => {
+  const validUrlRegex = new RegExp(
+    /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
+    'gm'
+  );
+  return validUrlRegex.test(url);
+};
+
 exports.logInfo = (message, ...params) => {
   if (!config.isProduction) {
-    console.log(`[INFO] ${message}`, params ? params : null);
+    if (params && params.length) {
+      console.log(`[INFO] ${message}`, params);
+    } else {
+      console.log(`[INFO] ${message}`);
+    }
   }
 };
 
 exports.logError = (message, ...params) => {
   if (!config.isProduction) {
-    console.error(`[ERROR] ${message}`, params);
+    if (params && params.length) {
+      console.error(`[ERROR] ${message}`, params);
+    } else {
+      console.error(`[ERROR] ${message}`);
+    }
   }
 };
 
@@ -158,7 +188,7 @@ exports.parseReplacements = replacements => {
   let replacementsArray = [];
   if (Array.isArray(replacements)) {
     replacementsArray = replacements;
-  } else {
+  } else if (replacements != null) {
     replacementsArray = [replacements];
   }
   replacementsArray.forEach(replacement => {

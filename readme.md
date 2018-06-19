@@ -15,19 +15,6 @@
    - crawlType: crawlType passed to the crawler
    - forceAllow: forceAllow passed to the crawler
 
-### /node
- - scrapes a page for all elements matching the specified query selector and sends a request to the apiUrl specified in config.
- - parameters
-   - url: the url to scrape **required**
-   - node: the node in the form of a querySelector to use **required**
-   - collection: collection passed to the crawler
-   - subcollection: subcollection passed to the crawler
-   - function: function passed to the crawler,
-   - synchronization: synchronization passed to the crawler
-   - enqueueType: enqueueType passed to the crawler
-   - crawlType: crawlType passed to the crawler
-   - forceAllow: forceAllow passed to the crawler
-
 ### /fullHtml
  - returns the full html of a URL after waiting the specified time
  - parameters
@@ -49,10 +36,6 @@ All values specified below should be encapsulated inside `module.exports = { ...
  - password
    - type: string
    - description: password to use when authenticating to the external service
- - dataReplacements:
-   - type: array of { replaceThis: 'x', withThis: 'y' }
-   - example: [{ replaceThis: '//', withThis: '' }],
-   - description: replace substrings of each scraped item
  - port
    - type: number
    - description: the port the server will run on
@@ -65,11 +48,39 @@ module.exports = {
   apiUrl: 'http://myUrl.com/best/api/ever',
   username: 'someusername',
   password: 'somepassword',
-  dataReplacements: [{ replaceThis: '//', withThis: '' }, { replaceThis: 'href="', withThis: 'href="yourUrlGoesHere' }],
   port: 3031,
   isProduction: true
 };
 ```
+
+---
+
+## Error Handling
+The scraper will return errors with a status of 500 in the following structure:
+```json
+{
+    "message": "An error has occurred",
+    "error": "URL is invalid",
+    "code": "E002",
+    "stack": "Error: URL is invalid\n    at Object.exports.scrapeUrlForFullHtml ..."
+}
+```
+
+**message** is a message related to the error
+
+**error** is the actual cause of the error
+
+**code** is a code representation of the error
+
+**stack** is the full stack trace of the error. This is only included if `isProduction` is true in the config.
+
+### Error Codes
+ - E001 : Url is required
+ - E002 : Url is invalid
+ - E003 : xpath string is required
+ - E004 : An error occurred in the context of the browser attempting to render the page at the specified URL. The error is included in the error message
+ - E005 : An error occurred when attempting to make a request to the url specified in the config with the results of the scrape
+ - E099 : An unknown error occurred
 
 ---
 
