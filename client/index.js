@@ -21,32 +21,62 @@ class App extends Component {
     });
   }
 
+  handleEditClick(val) {
+    const config = this.state.config;
+    config[val].isEditing = true;
+    this.setState({ config });
+  }
+
   render() {
     const { config } = this.state;
     return (
-      <div style={styles.app}>
-        <h1 className="title is-1">Scraper Configuration</h1>
-        <div className="content">
-          <div className="box">
-            <table className="table">
-              <thead>
-                <tr>
-                  <td>Setting</td>
-                  <td>Value</td>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.keys(config).map(val => (
-                  <tr key={val}>
-                    <td>{val}</td>
-                    <td>{config[val].toString()}</td>
+      <section className="section">
+        <div className="container">
+          <h1 className="title is-1">Scraper Configuration</h1>
+          <div className="content">
+            <div className="box">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <td>
+                      <strong>Setting</strong>
+                    </td>
+                    <td>
+                      <strong>Value</strong>
+                    </td>
+                    <td>
+                      <strong>Edit</strong>
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {Object.keys(config).map(val => {
+                    let boundEditClick = this.handleEditClick.bind(this, val);
+                    return (
+                      <tr key={val}>
+                        <td>{val}</td>
+                        <td>
+                          {config[val].isEditing ? (
+                            <input type="text" value={config[val].toString()} />
+                          ) : (
+                            config[val].toString()
+                          )}
+                        </td>
+                        <td>
+                          <i
+                            className="fa fa-pencil"
+                            onClick={boundEditClick}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 }
