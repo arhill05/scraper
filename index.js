@@ -6,10 +6,13 @@ const configReader = require('./config/configReader');
 const configController = require('./config/configController');
 const errorCodes = require('./errorCodes');
 const scraper = require('./scraper');
+const authHandler = require('./utils/authHandler');
 const config = configReader.readConfigSync();
 const app = express();
 
+
 app.use(bodyParser.json());
+app.use(authHandler);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('./public'));
 
