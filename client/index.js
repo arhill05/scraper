@@ -22,9 +22,15 @@ class App extends Component {
   }
 
   handleEditClick(val) {
-    const config = this.state.config;
-    config[val].isEditing = true;
-    this.setState({ config });
+    const input = document.getElementById(`${val}-input`),
+      display = document.getElementById(`${val}-display`),
+      editButton = document.getElementById(`${val}-edit-button`),
+      saveButton = document.getElementById(`${val}-save-button`);
+
+    input.classList.remove('is-invisible');
+    saveButton.classList.remove('is-invisible');
+    display.classList.add('is-invisible');
+    editButton.classList.add('is-invisible');
   }
 
   render() {
@@ -50,22 +56,25 @@ class App extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.keys(config).map(val => {
-                    let boundEditClick = this.handleEditClick.bind(this, val);
+                  {Object.keys(config).map(key => {
+                    const boundEditClick = this.handleEditClick.bind(this, key),
+                      value = config[key].toString();
                     return (
-                      <tr key={val}>
-                        <td>{val}</td>
+                      <tr key={key}>
+                        <td >{key}</td>
                         <td>
-                          {config[val].isEditing ? (
-                            <input type="text" value={config[val].toString()} />
-                          ) : (
-                            config[val].toString()
-                          )}
+                          <input id={`${key}-input`} className='is-invisible' type='text' style={{ width: '75%' }} defaultValue={value} />
+                          <span id={`${key}-display`}>{value}</span>
                         </td>
                         <td>
-                          <i
-                            className="fa fa-pencil"
+                          <i id={`${key}-edit-button`}
+                            className='far fa-edit'
                             onClick={boundEditClick}
+                          />
+                          <i
+                            className='far fa-save is-invisible'
+                            hidden='true'
+                            id={`${key}-save-button`}
                           />
                         </td>
                       </tr>
