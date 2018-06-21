@@ -10,13 +10,12 @@ const authHandler = require('./utils/authHandler');
 const config = configReader.readConfigSync();
 const app = express();
 
-
 app.use(bodyParser.json());
-app.use(authHandler);
+//app.use(authHandler);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('./public'));
 
-app.get('/config', configController.getConfig);
+app.get('/api/config', configController.getConfig);
 
 app.get('/xpath', async (req, res, next) => {
   const options = {
