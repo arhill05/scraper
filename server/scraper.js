@@ -1,7 +1,7 @@
 const Nightmare = require('nightmare');
 const configReader = require('./config/configReader');
 const axios = require('axios');
-const errorCodes = require('./errorCodes.js');
+const errorCodes = require('../errorCodes');
 let config = configReader.readConfigSync();
 const logger = require('./utils/logger');
 

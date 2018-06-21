@@ -2,7 +2,7 @@ const configReader = require('../config/configReader')
 let config = configReader.readConfigSync();
 
 exports.logInfo = (message, ...params) => {
-  if (!config.isProduction) {
+  if (!process.env.IS_PRODUCTION) {
     if (params && params.length) {
       console.log(`[INFO] ${message}`, params);
     } else {
@@ -12,7 +12,7 @@ exports.logInfo = (message, ...params) => {
 };
 
 exports.logError = (message, ...params) => {
-  if (!config.isProduction) {
+  if (!process.env.IS_PRODUCTION) {
     if (params && params.length) {
       console.error(`[ERROR] ${message}`, params);
     } else {
