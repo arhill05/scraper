@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import './app.css'
 
 const styles = {
   app: {
@@ -22,15 +23,35 @@ class App extends Component {
   }
 
   handleEditClick(val) {
+    this.setEditingState(val);
+  }
+
+  handleSaveClick(val) {
+    this.setDisplayState(val);
+  }
+
+  setEditingState(val) {
     const input = document.getElementById(`${val}-input`),
       display = document.getElementById(`${val}-display`),
       editButton = document.getElementById(`${val}-edit-button`),
       saveButton = document.getElementById(`${val}-save-button`);
 
-    input.classList.remove('is-invisible');
-    saveButton.classList.remove('is-invisible');
-    display.classList.add('is-invisible');
-    editButton.classList.add('is-invisible');
+    input.classList.remove('hidden');
+    saveButton.classList.remove('hidden');
+    display.classList.add('hidden');
+    editButton.classList.add('hidden');
+  }
+
+  setDisplayState(val) {
+    const input = document.getElementById(`${val}-input`),
+      display = document.getElementById(`${val}-display`),
+      editButton = document.getElementById(`${val}-edit-button`),
+      saveButton = document.getElementById(`${val}-save-button`);
+
+    input.classList.add('hidden');
+    saveButton.classList.add('hidden');
+    display.classList.remove('hidden');
+    editButton.classList.remove('hidden');
   }
 
   render() {
@@ -58,12 +79,13 @@ class App extends Component {
                 <tbody>
                   {Object.keys(config).map(key => {
                     const boundEditClick = this.handleEditClick.bind(this, key),
+                      boundSaveClick = this.handleSaveClick.bind(this, key),
                       value = config[key].toString();
                     return (
                       <tr key={key}>
                         <td >{key}</td>
                         <td>
-                          <input id={`${key}-input`} className='is-invisible' type='text' style={{ width: '75%' }} defaultValue={value} />
+                          <input id={`${key}-input`} className='hidden' type='text' style={{ width: '75%' }} defaultValue={value} />
                           <span id={`${key}-display`}>{value}</span>
                         </td>
                         <td>
@@ -72,8 +94,8 @@ class App extends Component {
                             onClick={boundEditClick}
                           />
                           <i
-                            className='far fa-save is-invisible'
-                            hidden='true'
+                            className='far fa-save hidden'
+                            onClick={boundSaveClick}
                             id={`${key}-save-button`}
                           />
                         </td>
