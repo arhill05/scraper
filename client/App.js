@@ -26,6 +26,10 @@ class App extends Component {
     this.setEditingState(val);
   }
 
+  handleCancelClick(val) {
+    this.setDisplayState(val);
+  }
+
   handleSaveClick(val) {
     const { config } = this.state,
       input = document.getElementById(`${val}-input`);
@@ -47,10 +51,12 @@ class App extends Component {
     const input = document.getElementById(`${val}-input`),
       display = document.getElementById(`${val}-display`),
       editButton = document.getElementById(`${val}-edit-button`),
-      saveButton = document.getElementById(`${val}-save-button`);
+      saveButton = document.getElementById(`${val}-save-button`),
+      cancelButton = document.getElementById(`${val}-cancel-button`);
 
     input.classList.remove('hidden');
     saveButton.classList.remove('hidden');
+    cancelButton.classList.remove('hidden');
     display.classList.add('hidden');
     editButton.classList.add('hidden');
   }
@@ -59,10 +65,12 @@ class App extends Component {
     const input = document.getElementById(`${val}-input`),
       display = document.getElementById(`${val}-display`),
       editButton = document.getElementById(`${val}-edit-button`),
-      saveButton = document.getElementById(`${val}-save-button`);
+      saveButton = document.getElementById(`${val}-save-button`),
+      cancelButton = document.getElementById(`${val}-cancel-button`);
 
     input.classList.add('hidden');
     saveButton.classList.add('hidden');
+    cancelButton.classList.add('hidden');
     display.classList.remove('hidden');
     editButton.classList.remove('hidden');
   }
@@ -75,16 +83,16 @@ class App extends Component {
           <h1 className="title is-1">Scraper Configuration</h1>
           <div className="content">
             <div className="box">
-              <table className="table">
+              <table className="table is-fullwidth">
                 <thead>
                   <tr>
-                    <td>
+                    <td width='25%'>
                       <strong>Setting</strong>
                     </td>
-                    <td>
+                    <td width='60%'>
                       <strong>Value</strong>
                     </td>
-                    <td>
+                    <td width='40%'>
                       <strong>Edit</strong>
                     </td>
                   </tr>
@@ -93,21 +101,22 @@ class App extends Component {
                   {Object.keys(config).map(key => {
                     const boundEditClick = this.handleEditClick.bind(this, key),
                       boundSaveClick = this.handleSaveClick.bind(this, key),
+                      boundCancelClick = this.handleCancelClick.bind(this, key),
                       value = config[key].toString();
                     return (
                       <tr key={key}>
-                        <td>{key}</td>
-                        <td>
+                        <td width='25%'>{key}</td>
+                        <td width='60%'>
                           <input
                             id={`${key}-input`}
-                            className="hidden"
+                            className="input hidden"
                             type="text"
                             style={{ width: '75%' }}
                             defaultValue={value}
                           />
                           <span id={`${key}-display`}>{value}</span>
                         </td>
-                        <td>
+                        <td width='40%'>
                           <i
                             id={`${key}-edit-button`}
                             className="far fa-edit"
@@ -117,6 +126,11 @@ class App extends Component {
                             className="far fa-save hidden"
                             onClick={boundSaveClick}
                             id={`${key}-save-button`}
+                          />
+                          <i
+                            className="fas fa-times hidden"
+                            onClick={boundCancelClick}
+                            id={`${key}-cancel-button`}
                           />
                         </td>
                       </tr>
