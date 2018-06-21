@@ -1,7 +1,9 @@
 const Nightmare = require('nightmare');
-const config = require('./config');
+const configReader = require('./config/configReader');
 const axios = require('axios');
 const errorCodes = require('./errorCodes.js');
+let config = configReader.readConfigSync();
+const logger = require('./utils/logger');
 
 exports.scrapeUrlForXpath = async options => {
   if (!options.url) {
@@ -22,8 +24,8 @@ exports.scrapeUrlForXpath = async options => {
   const nightmare = Nightmare({ show: false });
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
-  this.logInfo(`begin scrape`);
-  this.logInfo(`scraping ${options.url} for xpath ${options.xpath}`);
+  logger.logInfo(`begin scrape`);
+  logger.logInfo(`scraping ${options.url} for xpath ${options.xpath}`);
   try {
     result = await nightmare
       .goto(options.url)
@@ -43,11 +45,11 @@ exports.scrapeUrlForXpath = async options => {
       }, options.xpath)
       .catch(handleNightmareError);
 
-    this.logInfo(`end scrape`);
+    logger.logInfo(`end scrape`);
     await sendResults(result, options);
     return result;
   } catch (err) {
-    this.logError(`error while scraping: ${err}`);
+    logger.logError(`error while scraping: ${err}`);
     throw err;
   } finally {
     nightmare.end();
@@ -67,7 +69,7 @@ exports.scrapeUrlForFullHtml = async options => {
   }
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
-  this.logInfo(`begin scrapeUrlForFullHtml`);
+  logger.logInfo(`begin scrapeUrlForFullHtml`);
   const nightmare = Nightmare({ show: false });
   try {
     result = await nightmare
@@ -75,11 +77,11 @@ exports.scrapeUrlForFullHtml = async options => {
       .wait(wait)
       .evaluate(() => document.body.innerHTML)
       .catch(handleNightmareError);
-    this.logInfo(`end scrapeUrlForFullHtml`);
+    logger.logInfo(`end scrapeUrlForFullHtml`);
     result = replaceSubstrings(result, options.replacements);
     return result;
   } catch (err) {
-    this.logError(`error while scrapeUrlForFullHtml: ${err}`);
+    logger.logError(`error while scrapeUrlForFullHtml: ${err}`);
     throw err;
   } finally {
     nightmare.end();
@@ -87,7 +89,7 @@ exports.scrapeUrlForFullHtml = async options => {
 };
 
 sendResults = async (data, options) => {
-  this.logInfo(`begin crawler request`);
+  logger.logInfo(`begin crawler request`);
   let url = config.apiUrl;
   let results = [];
   try {
@@ -104,10 +106,10 @@ sendResults = async (data, options) => {
       results.push(response.data);
     }
   } catch (err) {
-    this.logError(`error while scraping: ${err}`);
+    logger.logError(`error while scraping: ${err}`);
     throw err;
   }
-  this.logInfo(`end crawler request`);
+  logger.logInfo(`end crawler request`);
   return results;
 };
 
@@ -157,26 +159,6 @@ isValidUrl = url => {
     'gm'
   );
   return validUrlRegex.test(url);
-};
-
-exports.logInfo = (message, ...params) => {
-  if (!config.isProduction) {
-    if (params && params.length) {
-      console.log(`[INFO] ${message}`, params);
-    } else {
-      console.log(`[INFO] ${message}`);
-    }
-  }
-};
-
-exports.logError = (message, ...params) => {
-  if (!config.isProduction) {
-    if (params && params.length) {
-      console.error(`[ERROR] ${message}`, params);
-    } else {
-      console.error(`[ERROR] ${message}`);
-    }
-  }
 };
 
 exports.parseReplacements = replacements => {

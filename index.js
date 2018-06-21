@@ -1,14 +1,19 @@
 const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
-const config = require('./config');
+const logger = require('./utils/logger');
+const configReader = require('./config/configReader');
+const configController = require('./config/configController');
 const errorCodes = require('./errorCodes');
 const scraper = require('./scraper');
+const config = configReader.readConfigSync();
 const app = express();
-const router = express.Router();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('./public'));
+
+app.get('/config', configController.getConfig);
 
 app.get('/xpath', async (req, res, next) => {
   const options = {
@@ -25,8 +30,8 @@ app.get('/xpath', async (req, res, next) => {
     forceAllow: req.query.forceAllow
   };
   try {
-    scraper.logInfo(`entering xpath endpoint`);
-    scraper.logInfo('Options:\n', options);
+    logger.logInfo(`entering xpath endpoint`);
+    logger.logInfo('Options:\n', options);
     const result = await scraper.scrapeUrlForXpath(options);
     res.send(result);
   } catch (err) {
@@ -48,8 +53,8 @@ app.get('/fullHtml', async (req, res, next) => {
         : null
   };
   try {
-    scraper.logInfo(`entering fullHtml endpoint`);
-    scraper.logInfo('Options:\n', options);
+    logger.logInfo(`entering fullHtml endpoint`);
+    logger.logInfo('Options:\n', options);
     const result = await scraper.scrapeUrlForFullHtml(options);
     res.send(result);
   } catch (err) {

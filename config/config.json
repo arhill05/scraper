@@ -1,0 +1,7 @@
+{
+  "apiUrl": "http://demo10.yippyhub.com/ysa/cgi-bin/velocity",
+  "username": "ahill",
+  "password": "password",
+  "port": 3031,
+  "isProduction": false
+}
