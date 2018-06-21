@@ -13,6 +13,7 @@ exports.getConfig = async (req, res) => {
 
 exports.updateConfig = async (req, res) => {
   try {
+    console.log(req.body);
     const isUpdateSuccessful = await configReader.updateConfig(req.body);
     if (isUpdateSuccessful) {
       res.send('Successfully updated config');

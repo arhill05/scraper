@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import './app.css'
+import './app.css';
 
 const styles = {
   app: {
@@ -27,7 +27,20 @@ class App extends Component {
   }
 
   handleSaveClick(val) {
-    this.setDisplayState(val);
+    const { config } = this.state,
+      input = document.getElementById(`${val}-input`);
+
+    config[val] = input.value;
+    this.setState({ config });
+    fetch('/api/config', {
+      body: JSON.stringify(config),
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }).then(response => {
+      this.setDisplayState(val);
+    });
   }
 
   setEditingState(val) {
@@ -83,18 +96,25 @@ class App extends Component {
                       value = config[key].toString();
                     return (
                       <tr key={key}>
-                        <td >{key}</td>
+                        <td>{key}</td>
                         <td>
-                          <input id={`${key}-input`} className='hidden' type='text' style={{ width: '75%' }} defaultValue={value} />
+                          <input
+                            id={`${key}-input`}
+                            className="hidden"
+                            type="text"
+                            style={{ width: '75%' }}
+                            defaultValue={value}
+                          />
                           <span id={`${key}-display`}>{value}</span>
                         </td>
                         <td>
-                          <i id={`${key}-edit-button`}
-                            className='far fa-edit'
+                          <i
+                            id={`${key}-edit-button`}
+                            className="far fa-edit"
                             onClick={boundEditClick}
                           />
                           <i
-                            className='far fa-save hidden'
+                            className="far fa-save hidden"
                             onClick={boundSaveClick}
                             id={`${key}-save-button`}
                           />

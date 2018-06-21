@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('./public'));
 
 app.get('/api/config', configController.getConfig);
+app.post('/api/config', configController.updateConfig);
 
 app.get('/xpath', async (req, res, next) => {
   const options = {
