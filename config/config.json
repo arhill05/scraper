@@ -1,8 +1,1 @@
-{
-  "apiUrl": "http://demo10.yippyhub.com/ysa/cgi-bin/velocity",
-  "username": "ahill",
-  "password": "password",
-  "port": 3031,
-  "isProduction": false,
-  "apiKey": "1a2b3c4d5e6f7g8h9i"
-}
+{"apiUrl":"http://demo10.yippyhub.com/ysa/cgi-bin/test","username":"ahill","password":"password","port":3031,"isProduction":false,"apiKey":"1a2b3c4d5e6f7g8h9i"}

@@ -19,7 +19,8 @@
     "jsonfile": "^4.0.0",
     "nightmare": "^3.0.1",
     "react": "^16.4.1",
-    "react-dom": "^16.4.1"
+    "react-dom": "^16.4.1",
+    "sweetalert2": "^7.24.1"
   },
   "nodemonConfig": {
     "ignore": [

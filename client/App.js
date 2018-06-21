@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import swal from 'sweetalert2';
 import './app.css';
 
 const styles = {
@@ -43,6 +44,15 @@ class App extends Component {
         'content-type': 'application/json'
       }
     }).then(response => {
+      swal({
+        title: 'Success!',
+        text: 'Config successfully updated',
+        type: 'success',
+        toast: true,
+        position: 'top-right',
+        timer: '3000',
+        showConfirmButton: false
+      });
       this.setDisplayState(val);
     });
   }
@@ -86,13 +96,13 @@ class App extends Component {
               <table className="table is-fullwidth">
                 <thead>
                   <tr>
-                    <td width='25%'>
+                    <td width="25%">
                       <strong>Setting</strong>
                     </td>
-                    <td width='60%'>
+                    <td width="60%">
                       <strong>Value</strong>
                     </td>
-                    <td width='40%'>
+                    <td width="40%">
                       <strong>Edit</strong>
                     </td>
                   </tr>
@@ -105,8 +115,8 @@ class App extends Component {
                       value = config[key].toString();
                     return (
                       <tr key={key}>
-                        <td width='25%'>{key}</td>
-                        <td width='60%'>
+                        <td width="25%">{key}</td>
+                        <td width="60%">
                           <input
                             id={`${key}-input`}
                             className="input hidden"
@@ -116,7 +126,7 @@ class App extends Component {
                           />
                           <span id={`${key}-display`}>{value}</span>
                         </td>
-                        <td width='40%'>
+                        <td width="40%">
                           <i
                             id={`${key}-edit-button`}
                             className="far fa-edit"
