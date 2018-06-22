@@ -10,3 +10,17 @@ i {
     margin-right: 16px;
     cursor: pointer;
 }
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.buttons button {
+    margin-left: 16px;
+}
+
+.swal2-confirm.button {
+    margin-right: 16px;
+}

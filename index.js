@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
-const errorCodes = require('./errorCodes');
+const errorCodes = require('./server/errorCodes');
 const configRoutes = require('./server/routes/configRoutes')
 const scraperRoutes = require('./server/routes/scraperRoutes');
 const app = express();

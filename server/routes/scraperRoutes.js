@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const scraper = require('../scraper');
-const errorCodes = require('../../errorCodes');
+const errorCodes = require('../../server/errorCodes');
 const logger = require('../utils/logger');
 
 router.get('/xpath', async (req, res, next) => {

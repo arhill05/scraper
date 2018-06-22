@@ -44,7 +44,7 @@ class ConfigTable extends Component {
       }
     }).then(response => {
       swal({
-        title: 'Success!',
+        title: 'success!',
         text: 'Config successfully updated',
         type: 'success',
         toast: true,
