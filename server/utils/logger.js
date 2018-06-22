@@ -1,4 +1,4 @@
-const configReader = require('../config/configReader')
+const configReader = require('../config/configReader');
 let config = configReader.readConfigSync();
 
 exports.logInfo = (message, ...params) => {

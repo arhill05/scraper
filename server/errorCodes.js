@@ -4,6 +4,7 @@ const ErrorCodesEnum = Object.freeze({
   XpathRequired: 'E003',
   BrowserContextError: 'E004',
   WebRequestError: 'E005',
+  UnknownConfig: 'E006',
   UnknownError: 'E099'
 });
 

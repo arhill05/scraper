@@ -1,9 +1,9 @@
 const Nightmare = require('nightmare');
-const configReader = require('./config/configReader');
+const configReader = require('../config/configReader');
 const axios = require('axios');
-const errorCodes = require('../server/errorCodes');
-let config = configReader.readConfigSync();
-const logger = require('./utils/logger');
+const errorCodes = require('../errorCodes');
+const logger = require('../utils/logger');
+let config = null;
 
 exports.scrapeUrlForXpath = async options => {
   if (!options.url) {
@@ -21,6 +21,14 @@ exports.scrapeUrlForXpath = async options => {
     err.code = errorCodes.UrlInvalid;
     throw err;
   }
+  const key = options.configKey ? options.configKey : null;
+  config = await configReader.readConfig(key);
+  if (!config) {
+    var err = new Error('Invalid config key');
+    err.code = errorCodes.UnknownConfig;
+    throw err;
+  }
+
   const nightmare = Nightmare({ show: false });
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
@@ -67,7 +75,18 @@ exports.scrapeUrlForFullHtml = async options => {
     err.code = errorCodes.UrlInvalid;
     throw err;
   }
+
+  const key = options.configKey ? options.configKey : null;
+  config = await configReader.readConfig(key);
+
+  if (!config) {
+    var err = new Error('Invalid config key');
+    err.code = errorCodes.UnknownConfig;
+    throw err;
+  }
+
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
+  console.log(config);
   let result = null;
   logger.logInfo(`begin scrapeUrlForFullHtml`);
   const nightmare = Nightmare({ show: false });
