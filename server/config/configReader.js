@@ -18,7 +18,7 @@ exports.readAllConfigs = async () => {
     logger.logError('Error while reading config', err);
     throw err;
   }
-}
+};
 
 exports.readConfig = async key => {
   try {
@@ -40,9 +40,9 @@ exports.getConfigKeys = async () => {
   }
 };
 
-exports.createConfig = async (key, newConfig) => {
+exports.createConfig = async (key, config) => {
   try {
-    await storage.setItem(key, newConfig);
+    await storage.setItem(key, config);
     const newConfig = await storage.getItem(key);
     return newConfig;
   } catch (err) {

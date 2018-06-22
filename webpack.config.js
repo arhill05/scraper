@@ -4,26 +4,32 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = options => {
   return {
-    entry: './client/App.js',
+    entry: ['babel-polyfill', './client/App.js'],
     mode: 'development',
     output: {
       path: outputDirectory,
       filename: 'bundle.js'
     },
+    devtool: 'source-map',
     module: {
-      rules: [{
-        test: /.js$/,
-        exclude: /node_modules/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true
-          }
-        }]
-      }, {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }]
+      rules: [
+        {
+          test: /.js$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true
+              }
+            }
+          ]
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader']
+        }
+      ]
     },
     devServer: {
       contentBase: outputDirectory,

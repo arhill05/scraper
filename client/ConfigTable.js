@@ -1,87 +1,25 @@
 import React, { Component } from 'react';
 import swal from 'sweetalert2';
+import configService from './config.service';
 class ConfigTable extends Component {
   constructor(props) {
     super(props);
-    this.state = { configKey: '', config: {} };
+    this.state = { configKey: '', config: {}, editMode: false };
   }
-  componentDidMount() {
-    fetch(`/api/config/${this.state.configKey}`).then(config => {
-      config.json().then(data => {
-        this.setState({ config: data });
-      });
-    });
-  }
+
+  componentDidMount() {}
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ configKey: nextProps.configKey, config: nextProps.config });
-  }
-
-  handleEditClick(val) {
-    this.setEditingState(val);
-  }
-
-  handleCancelClick(val) {
-    this.setDisplayState(val);
-  }
-
-  handleSaveClick(val) {
-    this.props.onConfigSave(val);
-    const { config } = this.state,
-      input = document.getElementById(`${val}-input`);
-
-    config[val] = input.value;
-    this.setState({ config });
-    fetch(`/api/config/${this.state.configKey}`, {
-      body: JSON.stringify(config),
-      method: 'PUT',
-      headers: {
-        'content-type': 'application/json'
-      }
-    }).then(response => {
-      swal({
-        title: 'success!',
-        text: 'Config successfully updated',
-        type: 'success',
-        toast: true,
-        position: 'top-right',
-        timer: '3000',
-        showConfirmButton: false
-      });
-      this.setDisplayState(val);
+    this.setState({
+      configKey: nextProps.configKey,
+      config: nextProps.config,
+      editMode: nextProps.editMode
     });
-  }
-
-  setEditingState(val) {
-    const input = document.getElementById(`${val}-input`),
-      display = document.getElementById(`${val}-display`),
-      editButton = document.getElementById(`${val}-edit-button`),
-      saveButton = document.getElementById(`${val}-save-button`),
-      cancelButton = document.getElementById(`${val}-cancel-button`);
-
-    input.classList.remove('hidden');
-    saveButton.classList.remove('hidden');
-    cancelButton.classList.remove('hidden');
-    display.classList.add('hidden');
-    editButton.classList.add('hidden');
-  }
-
-  setDisplayState(val) {
-    const input = document.getElementById(`${val}-input`),
-      display = document.getElementById(`${val}-display`),
-      editButton = document.getElementById(`${val}-edit-button`),
-      saveButton = document.getElementById(`${val}-save-button`),
-      cancelButton = document.getElementById(`${val}-cancel-button`);
-
-    input.classList.add('hidden');
-    saveButton.classList.add('hidden');
-    cancelButton.classList.add('hidden');
-    display.classList.remove('hidden');
-    editButton.classList.remove('hidden');
   }
 
   render() {
     const { config } = this.state;
+    console.log(config);
     return (
       <table className="table is-fullwidth">
         <thead>
@@ -99,42 +37,34 @@ class ConfigTable extends Component {
         </thead>
         <tbody>
           {Object.keys(config).map(key => {
-            const boundEditClick = this.handleEditClick.bind(this, key),
-              boundSaveClick = this.handleSaveClick.bind(this, key),
-              boundCancelClick = this.handleCancelClick.bind(this, key),
-              value = config[key].toString();
-            return (
-              <tr key={key}>
-                <td width="25%">{key}</td>
-                <td width="60%">
-                  <input
-                    id={`${key}-input`}
-                    className="input hidden"
-                    type="text"
-                    style={{ width: '75%' }}
-                    defaultValue={value}
-                  />
-                  <span id={`${key}-display`}>{value}</span>
-                </td>
-                <td width="40%">
-                  <i
-                    id={`${key}-edit-button`}
-                    className="far fa-edit"
-                    onClick={boundEditClick}
-                  />
-                  <i
-                    className="far fa-save hidden"
-                    onClick={boundSaveClick}
-                    id={`${key}-save-button`}
-                  />
-                  <i
-                    className="fas fa-times hidden"
-                    onClick={boundCancelClick}
-                    id={`${key}-cancel-button`}
-                  />
-                </td>
-              </tr>
-            );
+            if (this.state.editMode) {
+              return (
+                <tr key={key}>
+                  <td width="25%">{key}</td>
+                  <td width="60%">
+                    <input
+                      id={`${key}-input`}
+                      className="input"
+                      type="text"
+                      defaultValue={
+                        config[key] != null ? config[key].toString() : ''
+                      }
+                    />
+                  </td>
+                  <td width="40%">&nbsp;</td>
+                </tr>
+              );
+            } else {
+              return (
+                <tr key={key}>
+                  <td width="25%">{key}</td>
+                  <td width="60%">
+                    {config[key] != null ? config[key].toString() : ''}
+                  </td>
+                  <td width="40%">&nbsp;</td>
+                </tr>
+              );
+            }
           })}
         </tbody>
       </table>

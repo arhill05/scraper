@@ -7,6 +7,7 @@ exports.getAllConfigs = async (req, res) => {
     res.json(response);
   } catch (err) {
     logger.logError('Error while retrieving config', err);
+    res.status(500).send(err)
     throw err;
   }
 };
@@ -17,6 +18,7 @@ exports.getConfig = async (req, res) => {
     res.json(response);
   } catch (err) {
     logger.logError('Error while retrieving config', err);
+    res.status(500).send(err)
     throw err;
   }
 };
@@ -27,6 +29,7 @@ exports.getKeys = async (req, res) => {
     res.json(response);
   } catch (err) {
     logger.logError('Error while retrieving config keys', err);
+    res.status(500).send(err)
     throw err;
   }
 };
@@ -38,6 +41,7 @@ exports.updateConfig = async (req, res) => {
     if (isSuccessful) res.send('Successfully updated config');
   } catch (err) {
     logger.logError('Error while updating config', err);
+    res.status(500).send(err)
     throw err;
   }
 };
@@ -45,10 +49,12 @@ exports.updateConfig = async (req, res) => {
 exports.createConfig = async (req, res) => {
   try {
     const key = req.params.key;
+    console.log(req.body);
     const newConfig = await configReader.createConfig(key, req.body);
     res.json(newConfig);
   } catch (err) {
     logger.logError('Error while creating config', err);
+    res.status(500).send(err)
     throw err;
   }
 };
@@ -60,6 +66,7 @@ exports.deleteConfig = async (req, res) => {
     if (isSuccessful) res.send('Successfully deleted config');
   } catch (err) {
     logger.logError('Error while deleting config', err);
+    res.status(500).send(err)
     throw err;
   }
 };

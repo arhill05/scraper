@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import configService from './config.service';
 import swal from 'sweetalert2';
 import ConfigTable from './ConfigTable';
 import './app.css';
@@ -13,92 +14,96 @@ const styles = {
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedKey: '', configKeys: [], selectedConfig: {} };
+    this.state = {
+      selectedKey: '',
+      configKeys: [],
+      selectedConfig: {},
+      editMode: false,
+      isAdding: false
+    };
   }
 
-  componentDidMount() {
-    fetch('/api/config/keys')
-      .then(response => response.json())
-      .then(configKeys => {
-        const selectedKey = configKeys[0];
-        fetch(`api/config/${selectedKey}`)
-          .then(response => response.json())
-          .then(config => {
-            const selectedConfig = config;
-            this.setState({ configKeys, selectedConfig, selectedKey });
-          });
-      });
+  async componentDidMount() {
+    await this.refreshData();
   }
 
-  onConfigSave = (val) => {
-    console.log(val);
+  handleTabClick = async key => {
+    const config = await configService.getConfig(key);
+    this.setState({ selectedKey: key, selectedConfig: config });
   };
 
-  handleTabClick = key => {
-    fetch(`api/config/${key}`)
-      .then(response => response.json())
-      .then(config => {
-        this.setState({ selectedKey: key, selectedConfig: config });
-      });
-  };
-
-  handleAddClick = () => {
-    swal({
+  handleAddClick = async () => {
+    let shouldCloneFromDefault = false;
+    const addDialog = await swal({
       title: 'New config',
-      text: 'What do you want to name this config?',
+      html: `<div>
+      What do you want to name this config?
+      </div>
+      <div>
+      <label class="checkbox">
+        <input id="swal-input-1" type="checkbox">
+          Clone from default
+      </label>
+      </div>`,
       input: 'text',
       type: 'question',
       buttonsStyling: false,
+      preConfirm: name => {
+        return {
+          checked: document.getElementById('swal-input-1').checked,
+          name
+        };
+      },
       confirmButtonClass: 'button is-primary',
       confirmButtonText: 'Add'
-    }).then(result => {
-      const keys = this.state.configKeys;
-      keys.push(result.value);
-      this.setState({
-        configKeys: keys,
-        selectedKey: result.value,
-        isAdding: true
-      });
+    });
+    const keys = this.state.configKeys;
+    keys.push(addDialog.value.name);
+    const newConfig = addDialog.value.checked
+      ? await configService.getConfig('default')
+      : configService.getBlankConfig();
+    this.setState({
+      configKeys: keys,
+      selectedKey: addDialog.value.name,
+      isAdding: true,
+      selectedConfig: newConfig
     });
   };
 
-  handleDeleteClick = () => {
-    swal({
-      title: 'Are you sure?',
-      text: `Are you sure you want to delete the '${
-        this.state.selectedKey
-      }' config? This action is irreversible!`,
-      type: 'warning',
-      buttonsStyling: false,
-      showCancelButton: true,
-      confirmButtonText: 'Yep, delete it!',
-      confirmButtonClass: 'button is-primary',
-      cancelButtonClass: 'button is-danger'
-    }).then(result => {
-      if (result.value) {
-        fetch(`/api/config/${this.state.selectedKey}`, {
-          method: 'DELETE'
-        }).then(() => {
-          let newKeys = this.state.configKeys.filter(
-            x => x !== this.state.selectedKey
-          );
-          let newSelectedKey = newKeys[0];
-          this.setState({
-            configKeys: newKeys,
-            selectedKey: newSelectedKey
-          });
+  handleSaveClick = async () => {
+    let updatedConfig = this.state.selectedConfig;
+    Object.keys(this.state.selectedConfig).forEach(key => {
+      const val = document.getElementById(`${key}-input`).value;
+      updatedConfig[key] = val;
+    });
 
-          swal({
-            title: 'success!',
-            text: 'Config successfully deleted',
-            type: 'success',
-            toast: true,
-            position: 'top-right',
-            timer: '3000',
-            showConfirmButton: false
-          });
-        });
-      }
+    this.state.isAdding
+      ? await configService.createConfig(this.state.selectedKey, updatedConfig)
+      : await configService.updateConfig(this.state.selectedKey, updatedConfig);
+
+    this.setState({
+      selectedConfig: updatedConfig,
+      isAdding: false,
+      editMode: false
+    });
+  };
+
+  handleEditClick = () => {
+    this.setState({ editMode: true });
+  };
+
+  handleDeleteClick = async () => {
+    await configService.deleteConfig(this.state.selectedKey);
+    await this.refreshData();
+  };
+
+  refreshData = async () => {
+    const keys = await configService.getKeys();
+    const config = await configService.getConfig(keys[0]);
+    this.setState({
+      selectedKey: keys[0],
+      configKeys: keys,
+      selectedConfig: config
     });
   };
 
@@ -118,6 +123,7 @@ class App extends Component {
                   <a>{key}</a>
                 </li>
               ))}
+              <i className="far fa-plus-square" onClick={this.handleAddClick} />
             </ul>
           </div>
           <div className="content">
@@ -126,23 +132,33 @@ class App extends Component {
                 configKey={this.state.selectedKey}
                 config={this.state.selectedConfig}
                 onConfigSave={this.onConfigSave}
-                isAdding={this.state.isAdding}
+                editMode={this.state.editMode || this.state.isAdding}
               />
             </div>
             <div className="buttons">
-              <button
-                className="button is-primary"
-                onClick={this.handleAddClick}
-              >
-                Add new config
-              </button>
+              {this.state.editMode || this.state.isAdding ? (
+                <button
+                  className="button is-primary"
+                  onClick={this.handleSaveClick}
+                >
+                  Save
+                </button>
+              ) : (
+                <button
+                  className="button is-primary"
+                  onClick={this.handleEditClick}
+                >
+                  Edit
+                </button>
+              )}
+
               <button
                 className={`button is-danger ${
                   this.state.selectedKey === 'default' ? 'hidden' : ''
                 }`}
                 onClick={this.handleDeleteClick}
               >
-                Delete this config
+                Delete
               </button>
             </div>
           </div>
