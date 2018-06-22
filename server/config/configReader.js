@@ -10,6 +10,16 @@ const logger = require('../utils/logger');
 
 const writeFile = util.promisify(jsonfile.writeFile);
 
+exports.readAllConfigs = async () => {
+  try {
+    const configs = await storage.values();
+    return configs;
+  } catch (err) {
+    logger.logError('Error while reading config', err);
+    throw err;
+  }
+}
+
 exports.readConfig = async key => {
   try {
     const config = await storage.getItem(!key ? 'default' : key);

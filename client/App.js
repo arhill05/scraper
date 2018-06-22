@@ -13,19 +13,33 @@ const styles = {
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedKey: '', configKeys: [], isAdding: false };
+    this.state = { selectedKey: '', configKeys: [], selectedConfig: {} };
   }
 
   componentDidMount() {
     fetch('/api/config/keys')
       .then(response => response.json())
-      .then(data => {
-        this.setState({ configKeys: data, selectedKey: data[0] });
+      .then(configKeys => {
+        const selectedKey = configKeys[0];
+        fetch(`api/config/${selectedKey}`)
+          .then(response => response.json())
+          .then(config => {
+            const selectedConfig = config;
+            this.setState({ configKeys, selectedConfig, selectedKey });
+          });
       });
   }
 
+  onConfigSave = (val) => {
+    console.log(val);
+  };
+
   handleTabClick = key => {
-    this.setState({ selectedKey: key });
+    fetch(`api/config/${key}`)
+      .then(response => response.json())
+      .then(config => {
+        this.setState({ selectedKey: key, selectedConfig: config });
+      });
   };
 
   handleAddClick = () => {
@@ -110,6 +124,8 @@ class App extends Component {
             <div className="box">
               <ConfigTable
                 configKey={this.state.selectedKey}
+                config={this.state.selectedConfig}
+                onConfigSave={this.onConfigSave}
                 isAdding={this.state.isAdding}
               />
             </div>

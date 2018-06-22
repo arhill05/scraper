@@ -1,6 +1,16 @@
 const logger = require('../utils/logger');
 const configReader = require('./configReader');
 
+exports.getAllConfigs = async (req, res) => {
+  try {
+    const response = await configReader.readAllConfigs();
+    res.json(response);
+  } catch (err) {
+    logger.logError('Error while retrieving config', err);
+    throw err;
+  }
+};
+
 exports.getConfig = async (req, res) => {
   try {
     const response = await configReader.readConfig(req.params.key);
@@ -52,4 +62,4 @@ exports.deleteConfig = async (req, res) => {
     logger.logError('Error while deleting config', err);
     throw err;
   }
-}
+};

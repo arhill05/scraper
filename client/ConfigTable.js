@@ -14,21 +14,7 @@ class ConfigTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ configKey: nextProps.configKey });
-    if (nextProps.isAdding) {
-      fetch(`/api/config/default`).then(config => {
-        config.json().then(data => {
-          this.setState({ config: data });
-          Object.keys(data).forEach(this.setEditingState);
-        });
-      });
-    } else {
-      fetch(`/api/config/${nextProps.configKey}`).then(config => {
-        config.json().then(data => {
-          this.setState({ config: data });
-        });
-      });
-    }
+    this.setState({ configKey: nextProps.configKey, config: nextProps.config });
   }
 
   handleEditClick(val) {
@@ -40,6 +26,7 @@ class ConfigTable extends Component {
   }
 
   handleSaveClick(val) {
+    this.props.onConfigSave(val);
     const { config } = this.state,
       input = document.getElementById(`${val}-input`);
 
