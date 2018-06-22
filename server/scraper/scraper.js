@@ -86,7 +86,6 @@ exports.scrapeUrlForFullHtml = async options => {
   }
 
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
-  console.log(config);
   let result = null;
   logger.logInfo(`begin scrapeUrlForFullHtml`);
   const nightmare = Nightmare({ show: false });

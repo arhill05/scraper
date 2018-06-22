@@ -5,15 +5,15 @@ class Tabs extends Component {
     super(props);
     this.state = {
       keys: props.keys ? props.keys : [],
-      selectedKey: props.keys ? props.keys[0] : ''
+      selectedKey: null
     };
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       keys: nextProps.keys,
-      selectedKey: nextProps.selectedKey
-        ? nextProps.selectedKey
+      selectedKey: this.state.selectedKey
+        ? this.state.selectedKey
         : nextProps.keys[0]
     });
   }
