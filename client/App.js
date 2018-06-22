@@ -98,7 +98,7 @@ class App extends Component {
                 Add new config
               </button>
               <button
-                className="button is-danger"
+                className={`button is-danger ${this.state.selectedKey === 'default' ? 'hidden' : ''}`}
                 onClick={this.handleDeleteClick}
               >
                 Delete this config
