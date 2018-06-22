@@ -13,7 +13,7 @@ const styles = {
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedKey: '', configKeys: [] };
+    this.state = { selectedKey: '', configKeys: [], isAdding: false };
   }
 
   componentDidMount() {
@@ -26,6 +26,26 @@ class App extends Component {
 
   handleTabClick = key => {
     this.setState({ selectedKey: key });
+  };
+
+  handleAddClick = () => {
+    swal({
+      title: 'New config',
+      text: 'What do you want to name this config?',
+      input: 'text',
+      type: 'question',
+      buttonsStyling: false,
+      confirmButtonClass: 'button is-primary',
+      confirmButtonText: 'Add'
+    }).then(result => {
+      const keys = this.state.configKeys;
+      keys.push(result.value);
+      this.setState({
+        configKeys: keys,
+        selectedKey: result.value,
+        isAdding: true
+      });
+    });
   };
 
   handleDeleteClick = () => {
@@ -88,7 +108,10 @@ class App extends Component {
           </div>
           <div className="content">
             <div className="box">
-              <ConfigTable configKey={this.state.selectedKey} />
+              <ConfigTable
+                configKey={this.state.selectedKey}
+                isAdding={this.state.isAdding}
+              />
             </div>
             <div className="buttons">
               <button
@@ -98,7 +121,9 @@ class App extends Component {
                 Add new config
               </button>
               <button
-                className={`button is-danger ${this.state.selectedKey === 'default' ? 'hidden' : ''}`}
+                className={`button is-danger ${
+                  this.state.selectedKey === 'default' ? 'hidden' : ''
+                }`}
                 onClick={this.handleDeleteClick}
               >
                 Delete this config

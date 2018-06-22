@@ -15,11 +15,20 @@ class ConfigTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({ configKey: nextProps.configKey });
-    fetch(`/api/config/${nextProps.configKey}`).then(config => {
-      config.json().then(data => {
-        this.setState({ config: data });
+    if (nextProps.isAdding) {
+      fetch(`/api/config/default`).then(config => {
+        config.json().then(data => {
+          this.setState({ config: data });
+          Object.keys(data).forEach(this.setEditingState);
+        });
       });
-    });
+    } else {
+      fetch(`/api/config/${nextProps.configKey}`).then(config => {
+        config.json().then(data => {
+          this.setState({ config: data });
+        });
+      });
+    }
   }
 
   handleEditClick(val) {
