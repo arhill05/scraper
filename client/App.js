@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import configService from './config.service';
 import swal from 'sweetalert2';
 import ConfigTable from './ConfigTable';
+import Tabs from './Tabs';
 import './app.css';
 
 const styles = {
@@ -33,7 +34,6 @@ class App extends Component {
   };
 
   handleAddClick = async () => {
-    let shouldCloneFromDefault = false;
     const addDialog = await swal({
       title: 'New config',
       html: `<div>
@@ -112,25 +112,17 @@ class App extends Component {
       <section className="section">
         <div className="container">
           <h1 className="title is-1">Scraper Configuration</h1>
-          <div className="tabs">
-            <ul>
-              {this.state.configKeys.map(key => (
-                <li
-                  key={key}
-                  onClick={this.handleTabClick.bind(this, key)}
-                  className={this.state.selectedKey === key ? 'is-active' : ''}
-                >
-                  <a>{key}</a>
-                </li>
-              ))}
-              <i className="far fa-plus-square" onClick={this.handleAddClick} />
-            </ul>
-          </div>
+          <Tabs
+            keys={this.state.configKeys}
+            onTabClick={this.handleTabClick}
+            onAddClick={this.handleAddClick}
+          />
           <div className="content">
             <div className="box">
               <ConfigTable
                 configKey={this.state.selectedKey}
                 config={this.state.selectedConfig}
+                selectedKey={this.state.selectedKey}
                 onConfigSave={this.onConfigSave}
                 editMode={this.state.editMode || this.state.isAdding}
               />

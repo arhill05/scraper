@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import swal from 'sweetalert2';
-import configService from './config.service';
 class ConfigTable extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +17,6 @@ class ConfigTable extends Component {
 
   render() {
     const { config } = this.state;
-    console.log(config);
     return (
       <table className="table is-fullwidth">
         <thead>
