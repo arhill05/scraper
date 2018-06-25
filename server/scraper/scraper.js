@@ -93,11 +93,23 @@ exports.scrapeUrlForFullHtml = async options => {
     result = await nightmare
       .goto(options.url)
       .wait(wait)
-      .evaluate(() => document.body.innerHTML)
+      .evaluate((autoEnqueueTypes) => {
+        let regexString = '/([A-Z])*\.(.';
+        autoEnqueueTypes.forEach((type, index) => {
+          regexString += index == autoEnqueueTypes.length - 1 ? type : `type|`;
+        });
+        regexString += ')/';
+        const regex = new RegExp(regexString, "gi");
+        const autoEnqueue = regex.exec(document.body.innerHTML.toString());
+        const result = { html: document.body.innerHTML, autoEnqueue };
+        return result;
+      }, config.autoEnqueueTypes)
       .catch(handleNightmareError);
     logger.logInfo(`end scrapeUrlForFullHtml`);
+    //await enqueueFiles(result.autoEnqueue);
+    console.log(result.autoEnqueue);
     result = replaceSubstrings(result, options.replacements);
-    return result;
+    return result.html;
   } catch (err) {
     logger.logError(`error while scrapeUrlForFullHtml: ${err}`);
     throw err;
@@ -131,18 +143,23 @@ sendResults = async (data, options) => {
   return results;
 };
 
+enqueueFiles = async (data) => {
+  logger.logInfo(`begin autoEnqueueAttempt`);
+
+}
+
 constructUrl = (url, item, options) => {
   item = replaceSubstrings(item, options.replacements);
   let resultUrl = `${url}?url=${encodeURIComponent(item)}`;
   resultUrl += `&v.username=${config.username}&v.password=${
     config.password
-  }&v.indent=true&v.app=api-rest`;
+    }&v.indent=true&v.app=api-rest`;
   resultUrl += `&collection=${
     options.collection ? options.collection : 'example-metadata'
-  }`;
+    }`;
   resultUrl += `&v.function=${
     options.function ? options.function : 'search-collection-enqueue-url'
-  }`;
+    }`;
   if (options.subcollection) {
     resultUrl += `&subcollection=${options.subcollection}`;
   }
@@ -165,7 +182,7 @@ constructUrl = (url, item, options) => {
 handleNightmareError = async error => {
   var err = new Error(
     'An error occurred internally while attempting to scrape using the context of a browser: ' +
-      error.message
+    error.message
   );
   err.code = errorCodes.BrowserContextError;
   throw err;
