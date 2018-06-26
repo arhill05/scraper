@@ -110,14 +110,12 @@ exports.scrapeUrlForFullHtml = async options => {
             }
           }
         });
-        console.log(autoEnqueue);
         const result = { html: document.body.innerHTML, autoEnqueue };
         return result;
       }, config.autoEnqueueTypes.split(','))
       .catch(handleNightmareError);
     logger.logInfo(`end scrapeUrlForFullHtml`);
     await sendResults(result.autoEnqueue, options);
-    console.log(result.autoEnqueue);
     result = replaceSubstrings(result, options.replacements);
     return result.html;
   } catch (err) {
@@ -141,7 +139,6 @@ sendResults = async (data, options) => {
       }
     } else {
       let itemUrl = constructUrl(url, data, options);
-      console.log(itemUrl);
       const response = await axios.get(itemUrl);
       results.push(response.data);
     }
