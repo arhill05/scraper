@@ -9,7 +9,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('./public'));
+app.use(express.static('./dist'));
 app.use('/api/config', configRoutes)
 app.use('/scrape', scraperRoutes)
 
