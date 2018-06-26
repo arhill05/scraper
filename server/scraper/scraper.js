@@ -93,20 +93,30 @@ exports.scrapeUrlForFullHtml = async options => {
     result = await nightmare
       .goto(options.url)
       .wait(wait)
-      .evaluate((autoEnqueueTypes) => {
-        let regexString = '/([A-Z])*\.(.';
-        autoEnqueueTypes.forEach((type, index) => {
-          regexString += index == autoEnqueueTypes.length - 1 ? type : `type|`;
+      .evaluate(autoEnqueueTypes => {
+        let autoEnqueue = [];
+        autoEnqueueTypes.forEach(type => {
+          const xpath = `//a[contains(@href, "${type}")]`;
+          const result = document.evaluate(
+            xpath,
+            document,
+            null,
+            XPathResult.ANY_TYPE,
+            null
+          );
+          while ((node = result.iterateNext())) {
+            if (node.href) {
+              autoEnqueue.push(node.href);
+            }
+          }
         });
-        regexString += ')/';
-        const regex = new RegExp(regexString, "gi");
-        const autoEnqueue = regex.exec(document.body.innerHTML.toString());
+        console.log(autoEnqueue);
         const result = { html: document.body.innerHTML, autoEnqueue };
         return result;
-      }, config.autoEnqueueTypes)
+      }, config.autoEnqueueTypes.split(','))
       .catch(handleNightmareError);
     logger.logInfo(`end scrapeUrlForFullHtml`);
-    //await enqueueFiles(result.autoEnqueue);
+    await sendResults(result.autoEnqueue, options);
     console.log(result.autoEnqueue);
     result = replaceSubstrings(result, options.replacements);
     return result.html;
@@ -143,23 +153,22 @@ sendResults = async (data, options) => {
   return results;
 };
 
-enqueueFiles = async (data) => {
+enqueueFiles = async data => {
   logger.logInfo(`begin autoEnqueueAttempt`);
-
-}
+};
 
 constructUrl = (url, item, options) => {
   item = replaceSubstrings(item, options.replacements);
   let resultUrl = `${url}?url=${encodeURIComponent(item)}`;
   resultUrl += `&v.username=${config.username}&v.password=${
     config.password
-    }&v.indent=true&v.app=api-rest`;
+  }&v.indent=true&v.app=api-rest`;
   resultUrl += `&collection=${
     options.collection ? options.collection : 'example-metadata'
-    }`;
+  }`;
   resultUrl += `&v.function=${
     options.function ? options.function : 'search-collection-enqueue-url'
-    }`;
+  }`;
   if (options.subcollection) {
     resultUrl += `&subcollection=${options.subcollection}`;
   }
@@ -182,7 +191,7 @@ constructUrl = (url, item, options) => {
 handleNightmareError = async error => {
   var err = new Error(
     'An error occurred internally while attempting to scrape using the context of a browser: ' +
-    error.message
+      error.message
   );
   err.code = errorCodes.BrowserContextError;
   throw err;
