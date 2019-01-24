@@ -56,7 +56,11 @@ class ConfigTable extends Component {
                 <tr key={key}>
                   <td width="25%">{key}</td>
                   <td width="60%">
-                    {config[key] != null ? config[key].toString() : ""}
+                    {config[key] == null
+                      ? ""
+                      : key.toLowerCase().includes("password")
+                      ? "*****"
+                      : config[key].toString()}
                   </td>
                   <td width="40%">&nbsp;</td>
                 </tr>
