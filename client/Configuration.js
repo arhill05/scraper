@@ -98,7 +98,9 @@ class Configuration extends Component {
     this.setState({
       selectedKey: keys[0],
       configKeys: keys,
-      selectedConfig: config
+      selectedConfig: config,
+      editMode: false,
+      isAdding: false
     });
   };
 
@@ -109,6 +111,7 @@ class Configuration extends Component {
           <h1 className="title is-1">Scraper Configuration</h1>
           <Tabs
             keys={this.state.configKeys}
+            selectedKey={this.state.selectedKey}
             onTabClick={this.handleTabClick}
             onAddClick={this.handleAddClick}
           />

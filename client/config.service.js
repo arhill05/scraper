@@ -118,7 +118,13 @@ module.exports = {
       apiUrl: null,
       username: null,
       password: null,
-      autoEnqueueTypes: null
+      autoEnqueueTypes: null,
+      usernameFieldSelector: null,
+      passwordFieldSelector: null,
+      submitInputSelector: null,
+      loginUrl: null,
+      siteUsername: null,
+      sitePassword: null
     };
   }
 };

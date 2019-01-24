@@ -43,7 +43,8 @@ class App extends Component {
     );
     return (
       <section className="app-wrapper">
-        {this.state.isAuthenticated ? <Configuration /> : passwordInputForm}
+        {/* {this.state.isAuthenticated ? <Configuration /> : passwordInputForm} */}
+        <Configuration />
       </section>
     );
   }

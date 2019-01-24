@@ -12,9 +12,7 @@ class Tabs extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       keys: nextProps.keys,
-      selectedKey: this.state.selectedKey
-        ? this.state.selectedKey
-        : nextProps.keys[0]
+      selectedKey: nextProps.selectedKey ? nextProps.selectedKey : nextProps.keys[0]
     });
   }
 
