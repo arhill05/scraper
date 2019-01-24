@@ -221,7 +221,7 @@ class ConfigTable extends Component {
           ) : (
             <span>{config.useAuth || <em>empty</em>}</span>
           )}
-          <p className="help">The password to use when emulating a login for the site</p>
+          <p className="help">If true, the scraper will use the given credentials and login url to attempt to login to the site first</p>
         </div>
       </form>
     );
