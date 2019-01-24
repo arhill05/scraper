@@ -30,6 +30,16 @@ i {
   cursor: pointer;
 }
 
+.config-form {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  grid-column-gap: 32px;
+}
+
 .buttons {
   display: flex;
   align-items: center;

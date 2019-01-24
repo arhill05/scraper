@@ -65,10 +65,6 @@ class Configuration extends Component {
 
   handleSaveClick = async () => {
     let updatedConfig = this.state.selectedConfig;
-    Object.keys(this.state.selectedConfig).forEach(key => {
-      const val = document.getElementById(`${key}-input`).value;
-      updatedConfig[key] = val;
-    });
 
     this.state.isAdding
       ? await configService.createConfig(this.state.selectedKey, updatedConfig)
@@ -79,6 +75,12 @@ class Configuration extends Component {
       isAdding: false,
       editMode: false
     });
+  };
+
+  onConfigChange = (property, value) => {
+    let config = this.state.selectedConfig;
+    config[property] = value;
+    this.setState({ selectedConfig: config });
   };
 
   handleEditClick = () => {
@@ -116,7 +118,7 @@ class Configuration extends Component {
                 configKey={this.state.selectedKey}
                 config={this.state.selectedConfig}
                 selectedKey={this.state.selectedKey}
-                onConfigSave={this.onConfigSave}
+                onConfigChange={this.onConfigChange}
                 editMode={this.state.editMode || this.state.isAdding}
               />
             </div>
