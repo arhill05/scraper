@@ -84,7 +84,7 @@ exports.scrapeUrlForFullHtml = async options => {
   logger.logInfo(`begin scrapeUrlForFullHtml`);
   const nightmare = Nightmare({ show: false, typeInterval: 1 });
   try {
-    if (options.useAuth === 'true') {
+    if (config.useAuth === 'true') {
       result = await scrapeHtmlWithNightmareLogin(nightmare, options);
     } else {
       result = await scrapeHtml(nightmare, options);

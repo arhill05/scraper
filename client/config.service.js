@@ -124,7 +124,8 @@ module.exports = {
       submitInputSelector: null,
       loginUrl: null,
       siteUsername: null,
-      sitePassword: null
+      sitePassword: null,
+      useAuth: null
     };
   }
 };

@@ -202,7 +202,24 @@ class ConfigTable extends Component {
               defaultValue={config.sitePassword}
             />
           ) : (
-            <span>{config.sitePassword || <em>empty</em>}</span>
+            <span>{config.sitePassword ? '*****' : <em>empty</em>}</span>
+          )}
+          <p className="help">The password to use when emulating a login for the site</p>
+        </div>
+        <div className="field">
+          <label className="label">useAuth</label>
+          {this.state.editMode ? (
+            <input
+              placeholder="true"
+              className="input"
+              type="text"
+              onChange={e => {
+                this.onPropertyChange('useAuth', e.target.value);
+              }}
+              defaultValue={config.useAuth}
+            />
+          ) : (
+            <span>{config.useAuth || <em>empty</em>}</span>
           )}
           <p className="help">The password to use when emulating a login for the site</p>
         </div>
