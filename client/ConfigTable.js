@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 class ConfigTable extends Component {
   constructor(props) {
     super(props);
-    this.state = { configKey: '', config: {}, editMode: false };
+    this.state = { configKey: "", config: {}, editMode: false };
   }
 
   componentDidMount() {}
@@ -44,7 +44,7 @@ class ConfigTable extends Component {
                       className="input"
                       type="text"
                       defaultValue={
-                        config[key] != null ? config[key].toString() : ''
+                        config[key] != null ? config[key].toString() : ""
                       }
                     />
                   </td>
@@ -56,7 +56,7 @@ class ConfigTable extends Component {
                 <tr key={key}>
                   <td width="25%">{key}</td>
                   <td width="60%">
-                    {config[key] != null ? config[key].toString() : ''}
+                    {config[key] != null ? config[key].toString() : ""}
                   </td>
                   <td width="40%">&nbsp;</td>
                 </tr>
