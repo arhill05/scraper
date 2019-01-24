@@ -1,1 +1,6 @@
-{"key":"test3","value":{"apiUrl":"ghgkghkghgj","username":"fdsfafw","password":"fdsadfa","autoEnqueueTypes":".pdf"}}
+{"key":"test3","value":{"apiUrl":"ghgkghkghgj","username":"fdsfafw","password":"fdsadfa","autoEnqueueTypes":".pdf","usernameFieldId": "a",
+  "passwordFieldId": "a",
+  "loginUrl": "a",
+  "submitInputId": "a",
+  "siteUsername": "a",
+  "sitePassword": "a"}}

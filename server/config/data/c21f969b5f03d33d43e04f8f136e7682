@@ -1,1 +1,6 @@
-{"key":"default","value":{"apiUrl":"http://demo10.yippyhub.com/ysa/cgi-bin/velocity","username":"ahill","password":"password","autoEnqueueTypes":".pdf,.csv"}}
+{"key":"default","value":{"apiUrl":"http://demo10.yippyhub.com/ysa/cgi-bin/velocity","username":"ahill","password":"password","autoEnqueueTypes":".pdf,.csv","usernameFieldId": "a",
+  "passwordFieldId": "a",
+  "loginUrl": "a",
+  "submitInputId": "a",
+  "siteUsername": "a",
+  "sitePassword": "a"}}

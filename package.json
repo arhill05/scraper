@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "webpack-dev-server --env.dev",
+    "dev": "concurrently -n server,client -c \"yellow,blue\" \"npm run server\" \"npm run client\"",
+    "server": "nodemon index.js",
+    "client": "webpack-dev-server --env.dev",
     "build": "webpack"
   },
   "author": "",

@@ -1,160 +1,49 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import configService from './config.service';
+import Configuration from './Configuration';
 import swal from 'sweetalert2';
-import ConfigTable from './ConfigTable';
-import Tabs from './Tabs';
+import notificationService from './notification.service';
 import './app.css';
-
-const styles = {
-  app: {
-    padding: '32px'
-  }
-};
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedKey: '',
-      configKeys: [],
-      selectedConfig: {},
-      editMode: false,
-      isAdding: false
+      isAuthenticated: false,
+      password: ''
     };
   }
 
-  async componentDidMount() {
-    await this.refreshData();
-  }
-
-  handleTabClick = async key => {
-    const config = await configService.getConfig(key);
-    this.setState({ selectedKey: key, selectedConfig: config });
+  handlePasswordChange = e => {
+    this.setState({ password: e.target.value });
   };
 
-  handleAddClick = async () => {
-    const addDialog = await swal({
-      title: 'New config',
-      html: `<div>
-      What do you want to name this config?
-      </div>
-      <div>
-      <label class="checkbox">
-        <input id="swal-input-1" type="checkbox">
-          Clone from default
-      </label>
-      </div>`,
-      input: 'text',
-      type: 'question',
-      buttonsStyling: false,
-      preConfirm: name => {
-        return {
-          checked: document.getElementById('swal-input-1').checked,
-          name
-        };
-      },
-      confirmButtonClass: 'button is-primary',
-      confirmButtonText: 'Add'
-    });
-    const keys = this.state.configKeys;
-    keys.push(addDialog.value.name);
-    const newConfig = addDialog.value.checked
-      ? await configService.getConfig('default')
-      : configService.getBlankConfig();
-    this.setState({
-      configKeys: keys,
-      selectedKey: addDialog.value.name,
-      isAdding: true,
-      selectedConfig: newConfig
-    });
-  };
+  onPasswordSubmit = async e => {
+    e.preventDefault();
+    let isAuthenticated = await configService.authenticate(this.state.password);
+    if (!isAuthenticated) {
+      notificationService.showToast('ERROR', 'Invalid password', 'error');
+    }
 
-  handleSaveClick = async () => {
-    let updatedConfig = this.state.selectedConfig;
-    Object.keys(this.state.selectedConfig).forEach(key => {
-      const val = document.getElementById(`${key}-input`).value;
-      updatedConfig[key] = val;
-    });
-
-    this.state.isAdding
-      ? await configService.createConfig(this.state.selectedKey, updatedConfig)
-      : await configService.updateConfig(this.state.selectedKey, updatedConfig);
-
-    this.setState({
-      selectedConfig: updatedConfig,
-      isAdding: false,
-      editMode: false
-    });
-  };
-
-  handleEditClick = () => {
-    this.setState({ editMode: true });
-  };
-
-  handleDeleteClick = async () => {
-    await configService.deleteConfig(this.state.selectedKey);
-    await this.refreshData();
-  };
-
-  refreshData = async () => {
-    const keys = await configService.getKeys();
-    const config = await configService.getConfig(keys[0]);
-    this.setState({
-      selectedKey: keys[0],
-      configKeys: keys,
-      selectedConfig: config
-    });
+    this.setState({ isAuthenticated });
   };
 
   render() {
+    const passwordInputForm = (
+      <div className="password-wrapper">
+        <form className="password-form" onSubmit={this.onPasswordSubmit}>
+          <label>Password</label>
+          <input className="input" type="password" onChange={this.handlePasswordChange} />
+          <button className="button is-primary" type="submit">
+            Submit
+          </button>
+        </form>
+      </div>
+    );
     return (
-      <section className="section">
-        <div className="container">
-          <h1 className="title is-1">Scraper Configuration</h1>
-          <Tabs
-            keys={this.state.configKeys}
-            onTabClick={this.handleTabClick}
-            onAddClick={this.handleAddClick}
-          />
-          <div className="content">
-            <div className="box">
-              <ConfigTable
-                configKey={this.state.selectedKey}
-                config={this.state.selectedConfig}
-                selectedKey={this.state.selectedKey}
-                onConfigSave={this.onConfigSave}
-                editMode={this.state.editMode || this.state.isAdding}
-              />
-            </div>
-            <div className="buttons">
-              {this.state.editMode || this.state.isAdding ? (
-                <button
-                  className="button is-primary"
-                  onClick={this.handleSaveClick}
-                >
-                  Save
-                </button>
-              ) : (
-                <button
-                  className="button is-primary"
-                  onClick={this.handleEditClick}
-                >
-                  Edit
-                </button>
-              )}
-
-              <button
-                className={`button is-danger ${
-                  this.state.selectedKey === 'default' ? 'hidden' : ''
-                }`}
-                onClick={this.handleDeleteClick}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+      <section className="app-wrapper">
+        {this.state.isAuthenticated ? <Configuration /> : passwordInputForm}
       </section>
     );
   }

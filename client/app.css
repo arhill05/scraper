@@ -1,26 +1,45 @@
 body {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.password-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-form label {
+  display: block;
+  font-weight: bold;
+}
+
+.password-form button {
+  float: right;
+  margin-top: 8px;
 }
 
 .hidden {
-    display: none !important;
+  display: none !important;
 }
 
 i {
-    margin: 0 16px;
-    cursor: pointer;
+  margin: 0 16px;
+  cursor: pointer;
 }
 
 .buttons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .buttons button {
-    margin-left: 16px;
+  margin-left: 16px;
 }
 
 .swal2-confirm.button {
-    margin-right: 16px;
+  margin-right: 16px;
 }

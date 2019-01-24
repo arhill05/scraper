@@ -2,6 +2,26 @@ import swal from 'sweetalert2';
 import notificationService from './notification.service';
 
 module.exports = {
+  async authenticate(password) {
+    try {
+      const response = await fetch(`/api/config/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: password })
+      });
+
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      notificationService.showGenericError();
+    }
+  },
+
   async getConfig(key) {
     try {
       const response = await fetch(`/api/config/${key}`);
@@ -36,11 +56,7 @@ module.exports = {
       if (response.status !== 200) {
         throw new Error();
       }
-      notificationService.showToast(
-        'Success!',
-        'Config successfully created',
-        'success'
-      );
+      notificationService.showToast('Success!', 'Config successfully created', 'success');
     } catch (err) {
       notificationService.showGenericError();
     }
@@ -60,11 +76,7 @@ module.exports = {
         throw new Error();
       }
 
-      notificationService.showToast(
-        'Success!',
-        'Config successfully updated',
-        'success'
-      );
+      notificationService.showToast('Success!', 'Config successfully updated', 'success');
     } catch (err) {
       notificationService.showGenericError();
     }
