@@ -23,7 +23,6 @@
    - configKey: the key of the config file to use
    - waitTime: time to wait before scraping HTML
    - replacements: comma delimited replacements (i.e. ?replacements=a,b means a will be replaced with b in the result)
-   - useAuth: if set to 'true', it will use the login information from the configuration for the given key. If this is supplied, a valid configKey must be supplied as well
 
 ---
 
