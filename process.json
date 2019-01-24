@@ -6,7 +6,8 @@
       "env": {
         "DISPLAY": ":99"
       },
-      "instances": 0
+      "instances": 0,
+      "exec_mode": "cluster_mode"
     },
     {
       "name": "Xvfb",
