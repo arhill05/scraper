@@ -1,6 +1,6 @@
-{"key":"default","value":{"apiUrl":"http://demo10.yippyhub.com/ysa/cgi-bin/velocity","username":"ahill","password":"password","autoEnqueueTypes":".pdf,.csv","usernameFieldId": "a",
-  "passwordFieldId": "a",
+{"key":"default","value":{"apiUrl":"http://demo10.yippyhub.com/ysa/cgi-bin/velocity","username":"ahill","password":"password","autoEnqueueTypes":".pdf,.csv","usernameFieldSelector": "a",
+  "passwordFieldSelector": "a",
   "loginUrl": "a",
-  "submitInputId": "a",
+  "submitInputSelector": "a",
   "siteUsername": "a",
   "sitePassword": "a"}}

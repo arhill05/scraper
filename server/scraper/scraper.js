@@ -1,31 +1,31 @@
-const Nightmare = require("nightmare");
-const configReader = require("../config/configReader");
-const axios = require("axios");
-const errorCodes = require("../errorCodes");
-const logger = require("../utils/logger");
-const qs = require("querystring");
+const Nightmare = require('nightmare');
+const configReader = require('../config/configReader');
+const axios = require('axios');
+const errorCodes = require('../errorCodes');
+const logger = require('../utils/logger');
+const qs = require('querystring');
 let config = null;
 
 exports.scrapeUrlForXpath = async options => {
   if (!options.url) {
-    var err = new Error("URL is required");
+    var err = new Error('URL is required');
     err.code = errorCodes.UrlRequired;
     throw err;
   }
   if (!options.xpath) {
-    var err = new Error("xpath string is required");
+    var err = new Error('xpath string is required');
     err.code = errorCodes.XpathRequired;
     throw err;
   }
   if (!isValidUrl(options.url)) {
-    var err = new Error("URL is invalid");
+    var err = new Error('URL is invalid');
     err.code = errorCodes.UrlInvalid;
     throw err;
   }
   const key = options.configKey ? options.configKey : null;
   config = await configReader.readConfig(key);
   if (!config) {
-    var err = new Error("Invalid config key");
+    var err = new Error('Invalid config key');
     err.code = errorCodes.UnknownConfig;
     throw err;
   }
@@ -40,13 +40,7 @@ exports.scrapeUrlForXpath = async options => {
       .goto(options.url)
       .wait(wait)
       .evaluate(xpath => {
-        var result = document.evaluate(
-          xpath,
-          document,
-          null,
-          XPathResult.ANY_TYPE,
-          null
-        );
+        var result = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null);
         var node,
           nodes = [];
         while ((node = result.iterateNext())) nodes.push(node.nodeValue);
@@ -67,12 +61,12 @@ exports.scrapeUrlForXpath = async options => {
 
 exports.scrapeUrlForFullHtml = async options => {
   if (!options.url) {
-    var err = new Error("URL is required");
+    var err = new Error('URL is required');
     err.code = errorCodes.UrlRequired;
     throw err;
   }
   if (!isValidUrl(options.url)) {
-    var err = Error("URL is invalid");
+    var err = Error('URL is invalid');
     err.code = errorCodes.UrlInvalid;
     throw err;
   }
@@ -81,48 +75,20 @@ exports.scrapeUrlForFullHtml = async options => {
   config = await configReader.readConfig(key);
 
   if (!config) {
-    var err = new Error("Invalid config key");
+    var err = new Error('Invalid config key');
     err.code = errorCodes.UnknownConfig;
     throw err;
   }
 
-  let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
   logger.logInfo(`begin scrapeUrlForFullHtml`);
   const nightmare = Nightmare({ show: false, typeInterval: 1 });
   try {
-    result = await nightmare
-      .goto(config.loginUrl)
-      .wait(config.usernameFieldSelector)
-      .type(config.usernameFieldSelector, config.siteUsername)
-      .type(config.passwordFieldSelector, config.sitePassword)
-      .click(config.submitInputSelector)
-      .wait(500)
-      .goto(options.url)
-      .wait(wait)
-      .evaluate(autoEnqueueTypes => {
-        let autoEnqueue = [];
-        autoEnqueueTypes.forEach(type => {
-          const xpath = `//a[contains(@href, "${type}")]`;
-          const result = document.evaluate(
-            xpath,
-            document,
-            null,
-            XPathResult.ANY_TYPE,
-            null
-          );
-          while ((node = result.iterateNext())) {
-            if (node.href) {
-              autoEnqueue.push(node.href);
-            }
-          }
-        });
-        console.log(document.cookie);
-        const result = { html: document.body.innerHTML, autoEnqueue };
-        return result;
-      }, config.autoEnqueueTypes.split(","))
-      .end()
-      .catch(handleNightmareError);
+    if (options.useAuth === 'true') {
+      result = await scrapeHtmlWithNightmareLogin(nightmare, options);
+    } else {
+      result = await scrapeHtml(nightmare, options);
+    }
     logger.logInfo(`end scrapeUrlForFullHtml`);
     await sendResults(result.autoEnqueue, options);
     result = replaceSubstrings(result, options.replacements);
@@ -135,23 +101,100 @@ exports.scrapeUrlForFullHtml = async options => {
   }
 };
 
-exports.test = async options => {
-  const authResponse = await getCookies(
-    options.url + "login/",
-    "mdude2314@gmail.com",
-    "Julie.0327!"
-  );
+exports.parseReplacements = replacements => {
+  const response = [];
+  let replacementsArray = [];
+  if (Array.isArray(replacements)) {
+    replacementsArray = replacements;
+  } else if (replacements != null) {
+    replacementsArray = [replacements];
+  }
+  replacementsArray.forEach(replacement => {
+    const separated = replacement.split(',');
+    response.push({ replaceThis: separated[0], withThis: separated[1] });
+  });
 
-  return authResponse;
+  return response;
+};
+
+scrapeHtmlWithNightmareLogin = async (nightmareInstance, options) => {
+  logger.logInfo('emulating login before scraping');
+  const wait = options.waitTime ? Number(options.waitTime) : 1000;
+  const result = await nightmareInstance
+    .goto(config.loginUrl)
+    .wait(config.usernameFieldSelector)
+    .type(config.usernameFieldSelector, config.siteUsername)
+    .type(config.passwordFieldSelector, config.sitePassword)
+    .click(config.submitInputSelector)
+    .wait(500)
+    .goto(options.url)
+    .wait(wait)
+    .evaluate(autoEnqueueTypes => {
+      let autoEnqueue = [];
+      autoEnqueueTypes.forEach(type => {
+        const xpath = `//a[contains(@href, "${type}")]`;
+        const result = document.evaluate(
+          xpath,
+          document,
+          null,
+          XPathResult.ANY_TYPE,
+          null
+        );
+        while ((node = result.iterateNext())) {
+          if (node.href) {
+            autoEnqueue.push(node.href);
+          }
+        }
+      });
+      console.log(document.cookie);
+      const result = { html: document.body.innerHTML, autoEnqueue };
+      return result;
+    }, config.autoEnqueueTypes.split(','))
+    .end()
+    .catch(handleNightmareError);
+
+  return result;
+};
+
+scrapeHtml = async (nightmareInstance, options) => {
+  const wait = options.waitTime ? Number(options.waitTime) : 1000;
+  const result = await nightmareInstance
+    .goto(options.url)
+    .wait(wait)
+    .evaluate(autoEnqueueTypes => {
+      let autoEnqueue = [];
+      autoEnqueueTypes.forEach(type => {
+        const xpath = `//a[contains(@href, "${type}")]`;
+        const result = document.evaluate(
+          xpath,
+          document,
+          null,
+          XPathResult.ANY_TYPE,
+          null
+        );
+        while ((node = result.iterateNext())) {
+          if (node.href) {
+            autoEnqueue.push(node.href);
+          }
+        }
+      });
+      console.log(document.cookie);
+      const result = { html: document.body.innerHTML, autoEnqueue };
+      return result;
+    }, config.autoEnqueueTypes.split(','))
+    .end()
+    .catch(handleNightmareError);
+
+  return result;
 };
 
 getCookies = async (apiUrl, username, password) => {
   let result = await Nightmare({ show: true, typeInterval: 5 })
     .goto(apiUrl)
-    .wait("#auth")
-    .type("#auth", username)
-    .type("#password", password)
-    .click("#elSignIn_submit")
+    .wait('#auth')
+    .type('#auth', username)
+    .type('#password', password)
+    .click('#elSignIn_submit')
     .wait(2000)
     .cookies.get()
     .end()
@@ -206,10 +249,10 @@ constructUrl = (url, item, options) => {
     config.password
   }&v.indent=true&v.app=api-rest`;
   resultUrl += `&collection=${
-    options.collection ? options.collection : "example-metadata"
+    options.collection ? options.collection : 'example-metadata'
   }`;
   resultUrl += `&v.function=${
-    options.function ? options.function : "search-collection-enqueue-url"
+    options.function ? options.function : 'search-collection-enqueue-url'
   }`;
   if (options.subcollection) {
     resultUrl += `&subcollection=${options.subcollection}`;
@@ -233,7 +276,7 @@ constructUrl = (url, item, options) => {
 handleNightmareError = async error => {
   console.log(error);
   var err = new Error(
-    "An error occurred internally while attempting to scrape using the context of a browser: " +
+    'An error occurred internally while attempting to scrape using the context of a browser: ' +
       error.message
   );
   err.code = errorCodes.BrowserContextError;
@@ -243,31 +286,15 @@ handleNightmareError = async error => {
 isValidUrl = url => {
   const validUrlRegex = new RegExp(
     /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
-    "gm"
+    'gm'
   );
   return validUrlRegex.test(url);
-};
-
-exports.parseReplacements = replacements => {
-  const response = [];
-  let replacementsArray = [];
-  if (Array.isArray(replacements)) {
-    replacementsArray = replacements;
-  } else if (replacements != null) {
-    replacementsArray = [replacements];
-  }
-  replacementsArray.forEach(replacement => {
-    const separated = replacement.split(",");
-    response.push({ replaceThis: separated[0], withThis: separated[1] });
-  });
-
-  return response;
 };
 
 replaceSubstrings = (item, replacements) => {
   if (replacements && replacements.length) {
     replacements.forEach(r => {
-      item = item.replace(new RegExp(r.replaceThis, "g"), r.withThis);
+      item = item.replace(new RegExp(r.replaceThis, 'g'), r.withThis);
     });
   }
   return item;

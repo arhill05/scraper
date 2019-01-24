@@ -1,6 +1,1 @@
-{"key":"test3","value":{"apiUrl":"ghgkghkghgj","username":"fdsfafw","password":"fdsadfa","autoEnqueueTypes":".pdf","usernameFieldId": "a",
-  "passwordFieldId": "a",
-  "loginUrl": "a",
-  "submitInputId": "a",
-  "siteUsername": "a",
-  "sitePassword": "a"}}
+{"key":"test3","value":{"apiUrl":"ghgkghkghgj","username":"mdude2314@gmail.com","password":"Julie.0327!","autoEnqueueTypes":".pdf","usernameFieldSelector":"#auth","passwordFieldSelector":"#password","loginUrl":"https://elementumgaming.com/login/","submitInputSelector":"#elSignIn_submit","siteUsername":"mdude2314@gmail.com","sitePassword":"Julie.0327!"}}

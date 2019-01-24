@@ -3,10 +3,10 @@
   "username": "username",
   "password": "password",
   "autoEnqueueTypes": ".pdf",
-  "usernameFieldId": "a",
-  "passwordFieldId": "a",
+  "usernameFieldSelector": "a",
+  "passwordFieldSelector": "a",
   "loginUrl": "a",
-  "submitInputId": "a",
+  "submitInputSelector": "a",
   "siteUsername": "a",
   "sitePassword": "a"
 }

@@ -4,10 +4,10 @@ const configReader = require('./configReader');
 exports.authenticate = async (req, res) => {
   const { password } = req.body;
   if (password == process.env.ADMIN_PASSWORD) {
-    logger.logInfo('Authentication success');
+    logger.logInfo('Admin authentication success');
     res.status(200).send();
   } else {
-    logger.logInfo('Authentication fail');
+    logger.logInfo('Admin authentication fail');
     res.status(401).send();
   }
 };

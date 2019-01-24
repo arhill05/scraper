@@ -39,15 +39,7 @@ exports.xpath = async (req, res, next) => {
 
 exports.fullHtml = async (req, res, next) => {
   const options = {
-    url: req.query.url,
-    waitTime: req.query.waitTime,
-    configKey: req.query.configKey,
-    loginUrl: req.query.loginUrl,
-    usernameFieldId: req.query.usernameFieldId,
-    passwordFieldId: req.query.passwordFieldId,
-    submitInputId: req.query.submitInputId,
-    username: req.query.username,
-    password: req.query.password,
+    ...req.query,
     replacements:
       req.query.replacements != null ? replacementParser(req.query.replacements) : null
   };
