@@ -110,7 +110,6 @@ exports.parseReplacements = replacements => {
     replacementsArray = [replacements];
   }
   replacementsArray.forEach(replacement => {
-    console.log(replacement);
     const separated = replacement.split(',');
     response.push({ replaceThis: separated[0], withThis: separated[1] });
   });
@@ -147,7 +146,6 @@ scrapeHtmlWithNightmareLogin = async (nightmareInstance, options) => {
           }
         }
       });
-      console.log(document.cookie);
       const result = { html: document.body.innerHTML, autoEnqueue };
       return result;
     }, config.autoEnqueueTypes != null ? config.autoEnqueueTypes.split(',') : [])
@@ -179,7 +177,6 @@ scrapeHtml = async (nightmareInstance, options) => {
           }
         }
       });
-      console.log(document.cookie);
       const result = { html: document.body.innerHTML, autoEnqueue };
       return result;
     }, config.autoEnqueueTypes != null ? config.autoEnqueueTypes.split(',') : [])
