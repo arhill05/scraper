@@ -249,7 +249,7 @@ constructUrl = (url, item, options) => {
     config.password
   }&v.indent=true&v.app=api-rest`;
   resultUrl += `&collection=${
-    options.collection ? options.collection : 'example-metadata'
+    config.collection ? config.collection : 'example-metadata'
   }`;
   resultUrl += `&v.function=${
     options.function ? options.function : 'search-collection-enqueue-url'
