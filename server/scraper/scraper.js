@@ -4,7 +4,7 @@ const axios = require('axios');
 const errorCodes = require('../errorCodes');
 const logger = require('../utils/logger');
 const qs = require('querystring');
-let config = null;
+let _config = null;
 
 exports.scrapeUrlForXpath = async options => {
   if (!options.url) {
@@ -23,14 +23,14 @@ exports.scrapeUrlForXpath = async options => {
     throw err;
   }
   const key = options.configKey ? options.configKey : null;
-  config = await configReader.readConfig(key);
-  if (!config) {
+  _config = await configReader.readConfig(key);
+  if (!_config) {
     var err = new Error('Invalid config key');
     err.code = errorCodes.UnknownConfig;
     throw err;
   }
 
-  const nightmare = Nightmare({ show: false });
+  const nightmare = constructNightmareInstance();
   let wait = options.waitTime ? Number(options.waitTime) : 1000;
   let result = null;
   logger.logInfo(`begin scrape`);
@@ -72,9 +72,9 @@ exports.scrapeUrlForFullHtml = async options => {
   }
 
   const key = options.configKey ? options.configKey : null;
-  config = await configReader.readConfig(key);
+  _config = await configReader.readConfig(key);
 
-  if (!config) {
+  if (!_config) {
     var err = new Error('Invalid config key');
     err.code = errorCodes.UnknownConfig;
     throw err;
@@ -82,9 +82,9 @@ exports.scrapeUrlForFullHtml = async options => {
 
   let result = null;
   logger.logInfo(`begin scrapeUrlForFullHtml`);
-  const nightmare = Nightmare({ show: false, typeInterval: 1 });
+  const nightmare = constructNightmareInstance();
   try {
-    if (config.useAuth === 'true') {
+    if (_config.useAuth === 'true') {
       result = await scrapeHtmlWithNightmareLogin(nightmare, options);
     } else {
       result = await scrapeHtml(nightmare, options);
@@ -121,11 +121,11 @@ scrapeHtmlWithNightmareLogin = async (nightmareInstance, options) => {
   logger.logInfo('emulating login before scraping');
   const wait = options.waitTime ? Number(options.waitTime) : 1000;
   const result = await nightmareInstance
-    .goto(config.loginUrl)
-    .wait(config.usernameFieldSelector)
-    .type(config.usernameFieldSelector, config.siteUsername)
-    .type(config.passwordFieldSelector, config.sitePassword)
-    .click(config.submitInputSelector)
+    .goto(_config.loginUrl)
+    .wait(_config.usernameFieldSelector)
+    .type(_config.usernameFieldSelector, _config.siteUsername)
+    .type(_config.passwordFieldSelector, _config.sitePassword)
+    .click(_config.submitInputSelector)
     .wait(500)
     .goto(options.url)
     .wait(wait)
@@ -148,7 +148,7 @@ scrapeHtmlWithNightmareLogin = async (nightmareInstance, options) => {
       });
       const result = { html: document.body.innerHTML, autoEnqueue };
       return result;
-    }, config.autoEnqueueTypes != null ? config.autoEnqueueTypes.split(',') : [])
+    }, _config.autoEnqueueTypes != null ? _config.autoEnqueueTypes.split(',') : [])
     .end()
     .catch(handleNightmareError);
 
@@ -179,7 +179,7 @@ scrapeHtml = async (nightmareInstance, options) => {
       });
       const result = { html: document.body.innerHTML, autoEnqueue };
       return result;
-    }, config.autoEnqueueTypes != null ? config.autoEnqueueTypes.split(',') : [])
+    }, _config.autoEnqueueTypes != null ? _config.autoEnqueueTypes.split(',') : [])
     .end()
     .catch(handleNightmareError);
 
@@ -214,7 +214,7 @@ getCookies = async (apiUrl, username, password) => {
 
 sendResults = async (data, options) => {
   logger.logInfo(`begin crawler request`);
-  let url = config.apiUrl;
+  let url = _config.apiUrl;
   let results = [];
   try {
     if (data instanceof Array) {
@@ -243,11 +243,11 @@ enqueueFiles = async data => {
 constructUrl = (url, item, options) => {
   item = replaceSubstrings(item, options.replacements);
   let resultUrl = `${url}?url=${encodeURIComponent(item)}`;
-  resultUrl += `&v.username=${config.username}&v.password=${
-    config.password
+  resultUrl += `&v.username=${_config.username}&v.password=${
+    _config.password
   }&v.indent=true&v.app=api-rest`;
   resultUrl += `&collection=${
-    config.collection ? config.collection : 'example-metadata'
+    _config.collection ? _config.collection : 'example-metadata'
   }`;
   resultUrl += `&v.function=${
     options.function ? options.function : 'search-collection-enqueue-url'
@@ -272,10 +272,9 @@ constructUrl = (url, item, options) => {
 };
 
 handleNightmareError = async error => {
-  console.log(error);
   var err = new Error(
     'An error occurred internally while attempting to scrape using the context of a browser: ' +
-      error.message
+      error.message + ':' + error.details
   );
   err.code = errorCodes.BrowserContextError;
   throw err;
@@ -297,3 +296,17 @@ replaceSubstrings = (item, replacements) => {
   }
   return item;
 };
+
+constructNightmareInstance = () => {
+  let options = {
+    show: false,
+    typeInterval: 1
+  };
+
+  if(_config.proxyServer) {
+    options.switches = {
+      'proxy-server': _config.proxyServer
+    }
+  }
+  return Nightmare(options);
+}

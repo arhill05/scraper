@@ -8,5 +8,6 @@
   "loginUrl": "a",
   "submitInputSelector": "a",
   "siteUsername": "a",
-  "sitePassword": "a"
+  "sitePassword": "a",
+  "proxyUrl":"https://www.myproxy.com"
 }

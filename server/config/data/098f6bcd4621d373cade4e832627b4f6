@@ -1,1 +1,1 @@
-{"key":"test","value":{"apiUrl":"test","username":null,"password":null,"autoEnqueueTypes":null,"usernameFieldSelector":null,"passwordFieldSelector":null,"submitInputSelector":null,"loginUrl":null,"siteUsername":null,"sitePassword":null,"property":"test"}}
+{"key":"test","value":{"apiUrl":"test","username":null,"password":null,"autoEnqueueTypes":null,"usernameFieldSelector":null,"passwordFieldSelector":null,"submitInputSelector":null,"loginUrl":null,"siteUsername":null,"sitePassword":null,"property":"127.0.0.1:80","proxyServer":"127.0.0.1:80"}}

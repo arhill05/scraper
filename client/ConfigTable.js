@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 class ConfigTable extends Component {
   constructor(props) {
     super(props);
-    this.state = { configKey: "", config: {}, editMode: false };
+    this.state = { configKey: '', config: {}, editMode: false };
   }
 
   componentDidMount() {}
@@ -17,7 +17,7 @@ class ConfigTable extends Component {
 
   onPropertyChange = (property, value) => {
     let config = this.state.config;
-    config["property"] = value;
+    config['property'] = value;
     this.setState({ config });
 
     this.props.onConfigChange(property, value);
@@ -34,7 +34,7 @@ class ConfigTable extends Component {
               className="input"
               placeholder="https://my.indexer.com"
               onChange={e => {
-                this.onPropertyChange("apiUrl", e.target.value);
+                this.onPropertyChange('apiUrl', e.target.value);
               }}
               type="text"
               defaultValue={config.apiUrl}
@@ -51,7 +51,7 @@ class ConfigTable extends Component {
               className="input"
               placeholder="indexerUser"
               onChange={e => {
-                this.onPropertyChange("username", e.target.value);
+                this.onPropertyChange('username', e.target.value);
               }}
               type="text"
               defaultValue={config.username}
@@ -68,13 +68,13 @@ class ConfigTable extends Component {
               className="input"
               placeholder="supersecretpassword"
               onChange={e => {
-                this.onPropertyChange("password", e.target.value);
+                this.onPropertyChange('password', e.target.value);
               }}
               type="text"
               defaultValue={config.password}
             />
           ) : (
-            <span>{config.password ? "*****" : <em>empty</em>}</span>
+            <span>{config.password ? '*****' : <em>empty</em>}</span>
           )}
           <p className="help">Password to authenticate to the above API with</p>
         </div>
@@ -85,7 +85,7 @@ class ConfigTable extends Component {
               className="input"
               placeholder="VSE Collection Name"
               onChange={e => {
-                this.onPropertyChange("collection", e.target.value);
+                this.onPropertyChange('collection', e.target.value);
               }}
               type="text"
               defaultValue={config.collection}
@@ -104,7 +104,7 @@ class ConfigTable extends Component {
               className="input"
               placeholder=".pdf,.csv"
               onChange={e => {
-                this.onPropertyChange("autoEnqueueTypes", e.target.value);
+                this.onPropertyChange('autoEnqueueTypes', e.target.value);
               }}
               type="text"
               defaultValue={config.autoEnqueueTypes}
@@ -113,8 +113,8 @@ class ConfigTable extends Component {
             <span>{config.autoEnqueueTypes || <em>empty</em>}</span>
           )}
           <p className="help">
-            Comma delimited list (INCLUDING the period) of file extensions to automatically send
-            enqueue requests for
+            Comma delimited list (INCLUDING the period) of file extensions to
+            automatically send enqueue requests for
           </p>
         </div>
         <div className="field">
@@ -125,7 +125,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("usernameFieldSelector", e.target.value);
+                this.onPropertyChange('usernameFieldSelector', e.target.value);
               }}
               defaultValue={config.usernameFieldSelector}
             />
@@ -145,7 +145,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("passwordFieldSelector", e.target.value);
+                this.onPropertyChange('passwordFieldSelector', e.target.value);
               }}
               defaultValue={config.passwordFieldSelector}
             />
@@ -165,7 +165,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("submitInputSelector", e.target.value);
+                this.onPropertyChange('submitInputSelector', e.target.value);
               }}
               defaultValue={config.submitInputSelector}
             />
@@ -185,7 +185,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("loginUrl", e.target.value);
+                this.onPropertyChange('loginUrl', e.target.value);
               }}
               defaultValue={config.loginUrl}
             />
@@ -204,7 +204,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("siteUsername", e.target.value);
+                this.onPropertyChange('siteUsername', e.target.value);
               }}
               defaultValue={config.siteUsername}
             />
@@ -223,12 +223,12 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("sitePassword", e.target.value);
+                this.onPropertyChange('sitePassword', e.target.value);
               }}
               defaultValue={config.sitePassword}
             />
           ) : (
-            <span>{config.sitePassword ? "*****" : <em>empty</em>}</span>
+            <span>{config.sitePassword ? '*****' : <em>empty</em>}</span>
           )}
           <p className="help">
             The password to use when emulating a login for the site
@@ -242,7 +242,7 @@ class ConfigTable extends Component {
               className="input"
               type="text"
               onChange={e => {
-                this.onPropertyChange("useAuth", e.target.value);
+                this.onPropertyChange('useAuth', e.target.value);
               }}
               defaultValue={config.useAuth}
             />
@@ -252,6 +252,25 @@ class ConfigTable extends Component {
           <p className="help">
             If true, the scraper will use the given credentials and login url to
             attempt to login to the site first
+          </p>
+        </div>
+        <div className="field">
+          <label className="label">proxyServer</label>
+          {this.state.editMode ? (
+            <input
+              placeholder="https://www.myproxy.com"
+              className="input"
+              type="text"
+              onChange={e => {
+                this.onPropertyChange('proxyServer', e.target.value);
+              }}
+              defaultValue={config.proxyServer}
+            />
+          ) : (
+            <span>{config.proxyServer || <em>empty</em>}</span>
+          )}
+          <p className="help">
+            If supplied, the scraper will use a proxy server to perform the web scraping.
           </p>
         </div>
       </form>
