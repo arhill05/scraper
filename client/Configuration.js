@@ -13,7 +13,8 @@ class Configuration extends Component {
       configKeys: [],
       selectedConfig: {},
       editMode: false,
-      isAdding: false
+      isAdding: false,
+      unsavedChanges: false
     };
   }
 
@@ -22,8 +23,17 @@ class Configuration extends Component {
   }
 
   handleTabClick = async key => {
-    const config = await configService.getConfig(key);
-    this.setState({ selectedKey: key, selectedConfig: config });
+    if (this.state.unsavedChanges) {
+      const shouldLeave = await this.promptForUnsavedChanges();
+      if (shouldLeave) {
+        await this.removeUnsavedConfigKeys();
+        const config = await configService.getConfig(key);
+        this.setState({ selectedKey: key, selectedConfig: config });
+      }
+    } else {
+      const config = await configService.getConfig(key);
+      this.setState({ selectedKey: key, selectedConfig: config });
+    }
   };
 
   handleAddClick = async () => {
@@ -59,7 +69,8 @@ class Configuration extends Component {
       configKeys: keys,
       selectedKey: addDialog.value.name,
       isAdding: true,
-      selectedConfig: newConfig
+      selectedConfig: newConfig,
+      unsavedChanges: true
     });
   };
 
@@ -73,8 +84,16 @@ class Configuration extends Component {
     this.setState({
       selectedConfig: updatedConfig,
       isAdding: false,
-      editMode: false
+      editMode: false,
+      unsavedChanges: false
     });
+  };
+
+  removeUnsavedConfigKeys = async () => {
+    const keys = await configService.getKeys();
+    let currentKeys = this.state.configKeys;
+    currentKeys = currentKeys.filter(x => keys.includes(x));
+    this.setState({ configKeys: currentKeys });
   };
 
   onConfigChange = (property, value) => {
@@ -84,7 +103,7 @@ class Configuration extends Component {
   };
 
   handleEditClick = () => {
-    this.setState({ editMode: true });
+    this.setState({ editMode: true, unsavedChanges: true });
   };
 
   handleDeleteClick = async () => {
@@ -102,6 +121,22 @@ class Configuration extends Component {
       editMode: false,
       isAdding: false
     });
+  };
+
+  promptForUnsavedChanges = async () => {
+    const result = await swal({
+      title: 'Unsaved changes',
+      text:
+        'You have unsaved changes on this configuration. They will be lost if you leave!',
+      type: 'warning',
+      showCancelButton: true,
+      buttonsStyling: false,
+      confirmButtonClass: 'button is-primary',
+      cancelButtonClass: 'button is-danger',
+      confirmButtonText: 'Yes'
+    });
+
+    return result.value;
   };
 
   render() {
@@ -127,11 +162,17 @@ class Configuration extends Component {
             </div>
             <div className="buttons">
               {this.state.editMode || this.state.isAdding ? (
-                <button className="button is-primary" onClick={this.handleSaveClick}>
+                <button
+                  className="button is-primary"
+                  onClick={this.handleSaveClick}
+                >
                   Save
                 </button>
               ) : (
-                <button className="button is-primary" onClick={this.handleEditClick}>
+                <button
+                  className="button is-primary"
+                  onClick={this.handleEditClick}
+                >
                   Edit
                 </button>
               )}

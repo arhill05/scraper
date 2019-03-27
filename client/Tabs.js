@@ -17,7 +17,6 @@ class Tabs extends Component {
   }
 
   handleTabClick(key) {
-    this.setState({ selectedKey: key });
     this.props.onTabClick(key);
   }
 
