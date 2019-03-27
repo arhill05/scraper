@@ -36,6 +36,16 @@ class Configuration extends Component {
     }
   };
 
+  newConfigNameValidator = value => {
+    return new Promise(resolve => {
+      if (!this.state.configKeys.includes(value)) {
+        resolve();
+      } else {
+        resolve(`There is already a configuration named ${value}. Please give this new configuration a unique name!`);
+      }
+    });
+  };
+
   handleAddClick = async () => {
     const addDialog = await swal({
       title: 'New config',
@@ -51,6 +61,7 @@ class Configuration extends Component {
       input: 'text',
       type: 'question',
       buttonsStyling: false,
+      inputValidator: this.newConfigNameValidator,
       preConfirm: name => {
         return {
           checked: document.getElementById('swal-input-1').checked,
