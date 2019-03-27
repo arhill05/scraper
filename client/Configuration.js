@@ -12,6 +12,7 @@ class Configuration extends Component {
       selectedKey: '',
       configKeys: [],
       selectedConfig: {},
+      previousConfig: {},
       editMode: false,
       isAdding: false,
       unsavedChanges: false
@@ -41,7 +42,9 @@ class Configuration extends Component {
       if (!this.state.configKeys.includes(value)) {
         resolve();
       } else {
-        resolve(`There is already a configuration named ${value}. Please give this new configuration a unique name!`);
+        resolve(
+          `There is already a configuration named ${value}. Please give this new configuration a unique name!`
+        );
       }
     });
   };
@@ -114,7 +117,20 @@ class Configuration extends Component {
   };
 
   handleEditClick = () => {
-    this.setState({ editMode: true, unsavedChanges: true });
+    this.setState({
+      editMode: true,
+      unsavedChanges: true,
+      previousConfig: JSON.parse(JSON.stringify(this.state.selectedConfig))
+    });
+  };
+
+  handleCancelClick = () => {
+    this.setState({
+      selectedConfig: this.state.previousConfig,
+      previousConfig: {},
+      editMode: false,
+      isAdding: false
+    });
   };
 
   handleDeleteClick = async () => {
@@ -173,12 +189,20 @@ class Configuration extends Component {
             </div>
             <div className="buttons">
               {this.state.editMode || this.state.isAdding ? (
-                <button
-                  className="button is-primary"
-                  onClick={this.handleSaveClick}
-                >
-                  Save
-                </button>
+                <div>
+                  <button
+                    className="button is-primary"
+                    onClick={this.handleSaveClick}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="button is-warning"
+                    onClick={this.handleCancelClick}
+                  >
+                    Cancel
+                  </button>
+                </div>
               ) : (
                 <button
                   className="button is-primary"
