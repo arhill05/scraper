@@ -273,6 +273,44 @@ class ConfigTable extends Component {
             If supplied, the scraper will use a proxy server to perform the web scraping.
           </p>
         </div>
+        <div className="field">
+          <label className="label">proxyUsername</label>
+          {this.state.editMode ? (
+            <input
+              placeholder="username"
+              className="input"
+              type="text"
+              onChange={e => {
+                this.onPropertyChange('proxyUsername', e.target.value);
+              }}
+              defaultValue={config.proxyUsername}
+            />
+          ) : (
+            <span>{config.proxyUsername || <em>empty</em>}</span>
+          )}
+          <p className="help">
+            The username to use to authenticate to the given proxy server. If there is no authentication, simply leave this blank.
+          </p>
+        </div>
+        <div className="field">
+          <label className="label">proxyPassword</label>
+          {this.state.editMode ? (
+            <input
+              placeholder="password"
+              className="input"
+              type="text"
+              onChange={e => {
+                this.onPropertyChange('proxyPassword', e.target.value);
+              }}
+              defaultValue={config.proxyPassword}
+            />
+          ) : (
+            <span>{config.proxyPassword ? '*****' : <em>empty</em>}</span>
+          )}
+          <p className="help">
+            The password to use to authenticate to the given proxy server. If there is no authentication, simply leave this blank.
+          </p>
+        </div>
       </form>
     );
   }

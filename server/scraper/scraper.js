@@ -308,5 +308,11 @@ constructNightmareInstance = () => {
       'proxy-server': _config.proxyServer
     }
   }
-  return Nightmare(options);
+
+  if (_config.proxyUsername && _config.proxyPassword) {
+    return Nightmare(options).authentication(_config.proxyUsername, _config.proxyPassword);
+  }
+  else {
+    return Nightmare(options);
+  }
 }
